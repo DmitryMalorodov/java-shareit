@@ -31,19 +31,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(User user) {
-        user = userRepository.create(user);
-        return UserMapper.toUserDto(user);
+    public UserDto create(UserDto user) {
+        User createdUser = userRepository.create(UserMapper.toUser(user));
+        return UserMapper.toUserDto(createdUser);
     }
 
     @Override
-    public UserDto update(User newUser) {
+    public UserDto update(UserDto newUser) {
         User oldUser = UserMapper.toUser(getUserById(newUser.getId()));
         if (newUser.getName() != null && !newUser.getName().isBlank()) oldUser.setName(newUser.getName());
         if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) oldUser.setEmail(newUser.getEmail());
 
-        newUser = userRepository.update(oldUser);
-        return UserMapper.toUserDto(newUser);
+        oldUser = userRepository.update(oldUser);
+        return UserMapper.toUserDto(oldUser);
     }
 
     @Override

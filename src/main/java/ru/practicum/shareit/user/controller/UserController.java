@@ -32,12 +32,12 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Validated(OnCreate.class) @RequestBody final User user) {
+    public UserDto create(@Validated(OnCreate.class) @RequestBody final UserDto user) {
         return userService.create(user);
     }
 
     @PutMapping
-    public UserDto update(@Validated(OnUpdate.class) @RequestBody final User newUser) {
+    public UserDto update(@Validated(OnUpdate.class) @RequestBody final UserDto newUser) {
         return userService.update(newUser);
     }
 
