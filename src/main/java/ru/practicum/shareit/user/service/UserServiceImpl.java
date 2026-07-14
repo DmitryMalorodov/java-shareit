@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserDto newUser) {
-        User oldUser = UserMapper.toUser(getUserById(newUser.getId()));
+    public UserDto update(UserDto newUser, Long userId) {
+        User oldUser = UserMapper.toUser(getUserById(userId));
         if (newUser.getName() != null && !newUser.getName().isBlank()) oldUser.setName(newUser.getName());
         if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) oldUser.setEmail(newUser.getEmail());
 

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exceptions.EmailExistsException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
@@ -24,6 +25,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User create(User user) {
+        if (users.values().stream().anyMatch(u -> u.getEmail().equals(user.getEmail())))
+            throw new EmailExistsException("Полльзователь уже существует с email: " + user.getEmail());
+
         Long id = counter.incrementAndGet();
         user.setId(id);
         users.put(id, user);
@@ -32,6 +36,10 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User update(User newUser) {
+        if (users.values().stream().anyMatch(u -> u.getEmail().equals(newUser.getEmail())
+        && !u.getId().equals(newUser.getId())))
+            throw new EmailExistsException("Полльзователь уже существует с email: " + newUser.getEmail());
+
         User oldUser = users.get(newUser.getId());
         oldUser.setName(newUser.getName());
         oldUser.setEmail(newUser.getEmail());

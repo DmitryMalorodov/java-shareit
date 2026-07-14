@@ -8,6 +8,6 @@ public interface UserService {
     UserDto getUserById(Long id);
     Collection<UserDto> getUsers();
     UserDto create(UserDto user);
-    UserDto update(UserDto user);
+    UserDto update(UserDto user, Long userId);
     void deleteUser(Long id);
 }
