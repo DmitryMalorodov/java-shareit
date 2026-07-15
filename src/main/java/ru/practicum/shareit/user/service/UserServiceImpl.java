@@ -10,6 +10,8 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collection;
 
+import static ru.practicum.shareit.constant.message.UserValidationMessages.USER_NOT_FOUND_MESSAGE;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -19,7 +21,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Long id) {
         return userRepository.getUserById(id)
                 .map(UserMapper::toUserDto)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден с id: "  + id));
+                .orElseThrow(() -> new NotFoundException(String.format(USER_NOT_FOUND_MESSAGE, id)));
     }
 
     @Override
@@ -48,6 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
+        getUserById(id);
         userRepository.deleteUser(id);
     }
 }
