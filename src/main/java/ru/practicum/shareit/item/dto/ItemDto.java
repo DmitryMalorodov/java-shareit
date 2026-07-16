@@ -7,21 +7,24 @@ import lombok.Data;
 import ru.practicum.shareit.marker.OnCreate;
 import ru.practicum.shareit.request.model.ItemRequest;
 
+import static ru.practicum.shareit.constant.message.ItemValidMessages.*;
+
+
 /**
  * TODO Sprint add-controllers.
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class ItemDto {
     private Long id;
 
-    @NotBlank(groups = OnCreate.class, message = "Имя не может быть пустым")
+    @NotBlank(groups = OnCreate.class, message = NAME_BLANK_MESSAGE)
     private String name;
 
-    @NotBlank(groups = OnCreate.class, message = "Описание не может быть пустым")
+    @NotBlank(groups = OnCreate.class, message = DESCRIPTION_BLANK_MESSAGE)
     private String description;
 
-    @NotNull(groups = OnCreate.class, message = "Статус доступности к аренде не может быть пустым")
+    @NotNull(groups = OnCreate.class, message = AVAILABLE_NULL_MESSAGE)
     private Boolean available;
 
     private Long ownerId;

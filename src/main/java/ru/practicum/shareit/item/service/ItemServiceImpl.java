@@ -13,6 +13,9 @@ import ru.practicum.shareit.user.service.UserService;
 import java.util.Collection;
 import java.util.List;
 
+import static ru.practicum.shareit.constant.message.ItemValidMessages.ITEM_NOT_FOUND_MESSAGE;
+import static ru.practicum.shareit.constant.message.ItemValidMessages.ITEM_UPDATE_ACCESS_MESSAGE;
+
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
@@ -23,7 +26,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto getItemById(Long id) {
         return itemRepository.getItemById(id)
                 .map(ItemMapper::toItemDto)
-                .orElseThrow(() -> new NotFoundException("Вещь не найдена с id: "  + id));
+                .orElseThrow(() -> new NotFoundException(String.format(ITEM_NOT_FOUND_MESSAGE, id)));
     }
 
     @Override
@@ -46,7 +49,7 @@ public class ItemServiceImpl implements ItemService {
         ItemDto item = getItemById(itemId);
         Item oldItem = ItemMapper.toItem(item, item.getOwnerId());
         if (!oldItem.getOwnerId().equals(userId))
-            throw new AccessDeniedException("Вещь может редактировать только ее собственник");
+            throw new AccessDeniedException(ITEM_UPDATE_ACCESS_MESSAGE);
 
         if (newItem.getName() != null && !newItem.getName().isBlank()) oldItem.setName(newItem.getName());
         if (newItem.getDescription() != null && !newItem.getDescription().isBlank()) oldItem.setDescription(newItem.getDescription());

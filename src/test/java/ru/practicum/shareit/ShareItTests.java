@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,5 +43,12 @@ public class ShareItTests {
 		return mockMvc.perform(post("/users")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(user)));
+	}
+
+	protected ResultActions createItem(ItemDto item, Long userId) throws Exception {
+		return mockMvc.perform(post("/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("X-Sharer-User-Id", userId)
+				.content(objectMapper.writeValueAsString(item)));
 	}
 }

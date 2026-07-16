@@ -64,6 +64,8 @@ public class UpdateUserTests extends UserTest {
     private UserDto prepareReqBody(UserDto user) throws Exception {
         return user.toBuilder()
                 .id(getIdFromObject(createUser(user)))
+                .name("otherName")
+                .email("other@email.ru")
                 .build();
     }
 }
