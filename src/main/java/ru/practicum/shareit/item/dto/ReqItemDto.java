@@ -5,19 +5,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.marker.OnCreate;
-import ru.practicum.shareit.request.model.ItemRequest;
 
-import static ru.practicum.shareit.constant.message.ItemValidMessages.*;
+import static ru.practicum.shareit.constant.ValidMessages.NAME_BLANK_MESSAGE;
+import static ru.practicum.shareit.constant.message.ItemValidMessages.AVAILABLE_NULL_MESSAGE;
+import static ru.practicum.shareit.constant.message.ItemValidMessages.DESCRIPTION_BLANK_MESSAGE;
 
-
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder(toBuilder = true)
-public class ItemDto {
-    private Long id;
-
+public class ReqItemDto {
     @NotBlank(groups = OnCreate.class, message = NAME_BLANK_MESSAGE)
     private String name;
 
@@ -26,8 +21,4 @@ public class ItemDto {
 
     @NotNull(groups = OnCreate.class, message = AVAILABLE_NULL_MESSAGE)
     private Boolean available;
-
-    private Long ownerId;
-
-    private ItemRequest request;
 }

@@ -2,7 +2,7 @@ package ru.practicum.shareit.users;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.ReqUserDto;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -14,9 +14,10 @@ public class UpdateUserTests extends UserTest {
 
     @Test
     void checkChangeUser() throws Exception {
-        UserDto newUser = prepareReqBody(user);
+        Long userId = getIdFromObject(createUser(user));
+        ReqUserDto newUser = prepareReqBody(user);
 
-        changeUser(newUser)
+        changeUser(newUser, userId)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.email").value(newUser.getEmail()))
@@ -25,45 +26,48 @@ public class UpdateUserTests extends UserTest {
 
     @Test
     void checkEmailNullValidation() throws Exception {
-        UserDto newUser = prepareReqBody(user);
+        Long userId = getIdFromObject(createUser(user));
+        ReqUserDto newUser = prepareReqBody(user);
         newUser.setEmail(null);
 
-        changeUser(newUser)
+        changeUser(newUser, userId)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(user.getEmail()));
     }
 
     @Test
     void checkEmailNotCorrectValidation() throws Exception {
-        UserDto newUser = prepareReqBody(user);
+        Long userId = getIdFromObject(createUser(user));
+        ReqUserDto newUser = prepareReqBody(user);
         newUser.setEmail("email");
 
-        checkValidationError(changeUser(newUser), EMAIL_NOT_CORRECT_MESSAGE);
+        checkValidationError(changeUser(newUser, userId), EMAIL_NOT_CORRECT_MESSAGE);
     }
 
     @Test
     void checkNameNullValidation() throws Exception {
-        UserDto newUser = prepareReqBody(user);
+        Long userId = getIdFromObject(createUser(user));
+        ReqUserDto newUser = prepareReqBody(user);
         newUser.setName(null);
 
-        changeUser(newUser)
+        changeUser(newUser, userId)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(user.getName()));
     }
 
     @Test
     void checkNameBlankValidation() throws Exception {
-        UserDto newUser = prepareReqBody(user);
+        Long userId = getIdFromObject(createUser(user));
+        ReqUserDto newUser = prepareReqBody(user);
         newUser.setName(" ");
 
-        changeUser(newUser)
+        changeUser(newUser, userId)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(user.getName()));
     }
 
-    private UserDto prepareReqBody(UserDto user) throws Exception {
+    private ReqUserDto prepareReqBody(ReqUserDto user) {
         return user.toBuilder()
-                .id(getIdFromObject(createUser(user)))
                 .name("otherName")
                 .email("other@email.ru")
                 .build();

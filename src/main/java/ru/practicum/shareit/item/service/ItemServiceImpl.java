@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ReqItemDto;
+import ru.practicum.shareit.item.dto.RespItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -23,14 +24,14 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
 
     @Override
-    public ItemDto getItemById(Long id) {
+    public RespItemDto getItemById(Long id) {
         return itemRepository.getItemById(id)
                 .map(ItemMapper::toItemDto)
                 .orElseThrow(() -> new NotFoundException(String.format(ITEM_NOT_FOUND_MESSAGE, id)));
     }
 
     @Override
-    public Collection<ItemDto> getUserItems(Long userId) {
+    public Collection<RespItemDto> getUserItems(Long userId) {
         return itemRepository.getUserItems(userId)
                 .stream()
                 .map(ItemMapper::toItemDto)
@@ -38,16 +39,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto create(ItemDto item, Long userId) {
+    public RespItemDto create(ReqItemDto item, Long userId) {
         userService.getUserById(userId);
         Item createdItem = itemRepository.create(ItemMapper.toItem(item, userId));
         return ItemMapper.toItemDto(createdItem);
     }
 
     @Override
-    public ItemDto update(ItemDto newItem, Long userId, Long itemId) {
-        ItemDto item = getItemById(itemId);
-        Item oldItem = ItemMapper.toItem(item, item.getOwnerId());
+    public RespItemDto update(ReqItemDto newItem, Long userId, Long itemId) {
+        RespItemDto item = getItemById(itemId);
+        Item oldItem = ItemMapper. toItem(item, item.getOwnerId());
         if (!oldItem.getOwnerId().equals(userId))
             throw new AccessDeniedException(ITEM_UPDATE_ACCESS_MESSAGE);
 
@@ -60,7 +61,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> search(String text) {
+    public Collection<RespItemDto> search(String text) {
         if (text.isBlank()) return List.of();
 
         return itemRepository.search(text)

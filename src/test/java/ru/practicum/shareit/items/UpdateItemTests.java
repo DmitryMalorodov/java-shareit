@@ -2,7 +2,7 @@ package ru.practicum.shareit.items;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ReqItemDto;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,9 +16,10 @@ public class UpdateItemTests extends ItemsTest {
     @Test
     void checkChangeItem() throws Exception {
         Long userId = getIdFromObject(createUser(user));
-        ItemDto newItem = prepareReqBody(item, userId);
+        Long itemId = getIdFromObject(createItem(item, userId));
+        ReqItemDto newItem = prepareReqBody(item);
 
-        changeItem(newItem, userId, newItem.getId())
+        changeItem(newItem, userId, itemId)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value(newItem.getName()))
@@ -31,16 +32,17 @@ public class UpdateItemTests extends ItemsTest {
     void checkChangeItemWithOtherUser() throws Exception {
         Long userId = getIdFromObject(createUser(user));
         Long randomUserId = 100L;
-        ItemDto newItem = prepareReqBody(item, userId);
 
-        changeItem(newItem, randomUserId, newItem.getId())
+        Long itemId = getIdFromObject(createItem(item, userId));
+        ReqItemDto newItem = prepareReqBody(item);
+
+        changeItem(newItem, randomUserId, itemId)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(ITEM_UPDATE_ACCESS_MESSAGE));
     }
 
-    private ItemDto prepareReqBody(ItemDto item, Long userId) throws Exception {
+    private ReqItemDto prepareReqBody(ReqItemDto item) {
         return item.toBuilder()
-                .id(getIdFromObject(createItem(item, userId)))
                 .name("otherName")
                 .description("otherDesc")
                 .available(false)

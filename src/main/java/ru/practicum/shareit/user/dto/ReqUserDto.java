@@ -7,13 +7,13 @@ import lombok.Data;
 import ru.practicum.shareit.marker.OnCreate;
 import ru.practicum.shareit.marker.OnUpdate;
 
-import static ru.practicum.shareit.constant.message.UserValidationMessages.*;
+import static ru.practicum.shareit.constant.ValidMessages.NAME_BLANK_MESSAGE;
+import static ru.practicum.shareit.constant.message.UserValidationMessages.EMAIL_BLANK_MESSAGE;
+import static ru.practicum.shareit.constant.message.UserValidationMessages.EMAIL_NOT_CORRECT_MESSAGE;
 
 @Data
 @Builder(toBuilder = true)
-public class UserDto {
-    private Long id;
-
+public class ReqUserDto {
     @NotBlank(groups = OnCreate.class, message = NAME_BLANK_MESSAGE)
     private String name;
 

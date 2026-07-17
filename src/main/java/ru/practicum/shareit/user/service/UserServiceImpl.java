@@ -3,7 +3,8 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.ReqUserDto;
+import ru.practicum.shareit.user.dto.RespUserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -18,14 +19,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto getUserById(Long id) {
+    public RespUserDto getUserById(Long id) {
         return userRepository.getUserById(id)
                 .map(UserMapper::toUserDto)
                 .orElseThrow(() -> new NotFoundException(String.format(USER_NOT_FOUND_MESSAGE, id)));
     }
 
     @Override
-    public Collection<UserDto> getUsers() {
+    public Collection<RespUserDto> getUsers() {
         return userRepository.getUsers()
                 .stream()
                 .map(UserMapper::toUserDto)
@@ -33,13 +34,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(UserDto user) {
+    public RespUserDto create(ReqUserDto user) {
         User createdUser = userRepository.create(UserMapper.toUser(user));
         return UserMapper.toUserDto(createdUser);
     }
 
     @Override
-    public UserDto update(UserDto newUser, Long userId) {
+    public RespUserDto update(ReqUserDto newUser, Long userId) {
         User oldUser = UserMapper.toUser(getUserById(userId));
         if (newUser.getName() != null && !newUser.getName().isBlank()) oldUser.setName(newUser.getName());
         if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) oldUser.setEmail(newUser.getEmail());
