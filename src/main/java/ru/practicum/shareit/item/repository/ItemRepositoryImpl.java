@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
     private final Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, List<Item>> userItems = new HashMap<>();
     private final AtomicLong counter = new AtomicLong(0L);
 
     @Override
@@ -19,9 +20,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Collection<Item> getUserItems(Long userId) {
-        return items.values().stream()
-                .filter(item -> item.getOwnerId().equals(userId))
-                .toList();
+        return userItems.getOrDefault(userId, List.of());
     }
 
     @Override
@@ -29,6 +28,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         Long id = counter.incrementAndGet();
         item.setId(id);
         items.put(id, item);
+        userItems.computeIfAbsent(item.getOwnerId(), k -> new ArrayList<>()).add(item);
         return item;
     }
 

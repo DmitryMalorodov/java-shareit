@@ -12,6 +12,7 @@ import static ru.practicum.shareit.constant.message.UserValidationMessages.USER_
 @Repository
 public class UserRepositoryImpl implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
+    private final Set<String> registeredEmails = new HashSet<>();
     private final AtomicLong counter = new AtomicLong(0L);
 
     @Override
@@ -28,23 +29,26 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User create(User user) {
         //проверяем, что указанный email еще никем не занят
-        if (users.values().stream().anyMatch(u -> u.getEmail().equals(user.getEmail())))
-            throw new EmailExistsException(String.format(USER_ALREADY_EXISTS_WITH_EMAIL, user.getEmail()));
+        checkEmail(user);
 
         Long id = counter.incrementAndGet();
         user.setId(id);
         users.put(id, user);
+        registeredEmails.add(user.getEmail());
         return user;
     }
 
     @Override
     public User update(User newUser) {
-        //проверяем, что указанный email еще никем не занят, кроме целевого юзера
-        if (users.values().stream().anyMatch(u -> u.getEmail().equals(newUser.getEmail())
-        && !u.getId().equals(newUser.getId())))
-            throw new EmailExistsException(String.format(USER_ALREADY_EXISTS_WITH_EMAIL, newUser.getEmail()));
-
         User oldUser = users.get(newUser.getId());
+
+        //если email изменился, то проверяем, что указанный email еще никем не занят
+        if (!oldUser.getEmail().equals(newUser.getEmail())) {
+            checkEmail(newUser);
+            registeredEmails.remove(oldUser.getEmail());
+            registeredEmails.add(newUser.getEmail());
+        }
+
         oldUser.setName(newUser.getName());
         oldUser.setEmail(newUser.getEmail());
         return newUser;
@@ -52,6 +56,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void deleteUser(Long id) {
+        registeredEmails.remove(users.get(id).getEmail());
         users.remove(id);
+    }
+
+    private void checkEmail(User user) {
+        if (registeredEmails.contains(user.getEmail()))
+            throw new EmailExistsException(String.format(USER_ALREADY_EXISTS_WITH_EMAIL, user.getEmail()));
     }
 }
