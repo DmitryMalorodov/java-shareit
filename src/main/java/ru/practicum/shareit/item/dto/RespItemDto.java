@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,8 +8,8 @@ import ru.practicum.shareit.request.model.ItemRequest;
  * TODO Sprint add-controllers.
  */
 @Data
-@Builder
-public class Item {
+@Builder(toBuilder = true)
+public class RespItemDto {
     private Long id;
     private String name;
     private String description;
