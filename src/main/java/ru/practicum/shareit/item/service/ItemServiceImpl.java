@@ -9,6 +9,8 @@ import ru.practicum.shareit.item.dto.RespItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
@@ -20,19 +22,19 @@ import static ru.practicum.shareit.constant.message.ItemValidMessages.ITEM_UPDAT
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private final ItemRepository itemRepository;
     private final UserService userService;
+    private final ItemRepository itemRepository;
 
     @Override
     public RespItemDto getItemById(Long id) {
-        return itemRepository.getItemById(id)
+        return itemRepository.findById(id)
                 .map(ItemMapper::toItemDto)
                 .orElseThrow(() -> new NotFoundException(String.format(ITEM_NOT_FOUND_MESSAGE, id)));
     }
 
     @Override
     public Collection<RespItemDto> getUserItems(Long userId) {
-        return itemRepository.getUserItems(userId)
+        return itemRepository.findByOwnerId(userId)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .toList();
@@ -40,22 +42,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public RespItemDto create(ReqItemDto item, Long userId) {
-        userService.getUserById(userId);
-        Item createdItem = itemRepository.create(ItemMapper.toItem(item, userId));
+        User user = UserMapper.toUser(userService.getUserById(userId));
+        Item createdItem = itemRepository.save(ItemMapper.toItem(item, user));
         return ItemMapper.toItemDto(createdItem);
     }
 
     @Override
     public RespItemDto update(ReqItemDto newItem, Long userId, Long itemId) {
         RespItemDto item = getItemById(itemId);
-        Item oldItem = ItemMapper. toItem(item, item.getOwnerId());
-        if (!oldItem.getOwnerId().equals(userId))
+        Item oldItem = ItemMapper. toItem(item);
+        if (!oldItem.getOwner().getId().equals(userId))
             throw new AccessDeniedException(ITEM_UPDATE_ACCESS_MESSAGE);
 
         if (newItem.getName() != null && !newItem.getName().isBlank()) oldItem.setName(newItem.getName());
         if (newItem.getDescription() != null && !newItem.getDescription().isBlank()) oldItem.setDescription(newItem.getDescription());
         if (newItem.getAvailable() != null) oldItem.setAvailable(newItem.getAvailable());
-        oldItem = itemRepository.update(oldItem);
+        oldItem = itemRepository.save(oldItem);
 
         return ItemMapper.toItemDto(oldItem);
     }
