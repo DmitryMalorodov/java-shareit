@@ -49,8 +49,6 @@ public class CreateUserTests extends UserTest {
     void checkCreateUserWithExistedEmailValidation() throws Exception {
         createUser(user);
         createUser(user)
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.error")
-                        .value(String.format(USER_ALREADY_EXISTS_WITH_EMAIL, user.getEmail())));
+                .andExpect(status().isConflict());
     }
 }

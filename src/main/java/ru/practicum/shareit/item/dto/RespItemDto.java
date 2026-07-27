@@ -16,5 +16,5 @@ public class RespItemDto {
     private String description;
     private Boolean available;
     private User owner;
-    private ItemRequest request;
+    //private ItemRequest request;
 }

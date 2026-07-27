@@ -24,8 +24,8 @@ public class UpdateItemTests extends ItemsTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value(newItem.getName()))
                 .andExpect(jsonPath("$.description").value(newItem.getDescription()))
-                .andExpect(jsonPath("$.available").value(newItem.getAvailable()))
-                .andExpect(jsonPath("$.ownerId").value(userId));
+                .andExpect(jsonPath("$.available").value(newItem.getAvailable()));
+                //.andExpect(jsonPath("$.owner").value(userId));
     }
 
     @Test

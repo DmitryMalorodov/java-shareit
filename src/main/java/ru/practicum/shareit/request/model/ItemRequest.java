@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 /**
  * TODO Sprint add-item-requests.
  */
-@Data
+//@Data
 public class ItemRequest {
-    private Long id;
-    private String description;
-    private User requestor;
-    private LocalDateTime created;
+    //private Long id;
+    //private String description;
+    //private User requestor;
+    //private LocalDateTime created;
 }

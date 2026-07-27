@@ -33,5 +33,5 @@ public class Item {
     private User owner;
 
     //@Column(name = "request_id")
-    private ItemRequest request;
+    //private ItemRequest request;
 }

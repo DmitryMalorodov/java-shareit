@@ -6,6 +6,7 @@ import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.booking.dto.RespBookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -66,15 +67,16 @@ public class BookingServiceImpl implements BookingService {
 
     //ДОБАВИТЬ СОРТИРОВКУ!!!!!!!!!!!!!!!!!
     @Override
-    public Collection<RespBookingDto> getUserBookings(Long userId, String state) {
-        switch (state) {
+    public Collection<RespBookingDto> getUserBookings(Long userId, BookingStatus state) {
+        switch (state.toString()) {
             case "ALL" -> {
                 return BookingMapper.toRespBookingDto(bookingRepository.findByBookerId(userId));
             }
 
             case "CURRENT" -> {
                 return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByBookerIdAndStartIsBetween_____(userId, LocalDateTime.now()));
+                        bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(
+                                userId, LocalDateTime.now(), LocalDateTime.now()));
             }
 
             case "PAST" -> {
@@ -88,7 +90,7 @@ public class BookingServiceImpl implements BookingService {
             }
 
             case "WAITING", "REJECTED" -> {
-                return BookingMapper.toRespBookingDto(bookingRepository.findByBookerIdAndStatusIs____(userId, state));
+                return BookingMapper.toRespBookingDto(bookingRepository.findByBookerIdAndStatus(userId, state));
             }
 
             default -> throw new IllegalArgumentException("______________");

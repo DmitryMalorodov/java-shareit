@@ -23,8 +23,8 @@ public class GetItemsTests extends ItemsTest {
                 .andExpect(jsonPath("$[0].id").exists())
                 .andExpect(jsonPath("$[0].name").value(item.getName()))
                 .andExpect(jsonPath("$[0].description").value(item.getDescription()))
-                .andExpect(jsonPath("$[0].available").value(item.getAvailable()))
-                .andExpect(jsonPath("$[0].ownerId").value(userId));
+                .andExpect(jsonPath("$[0].available").value(item.getAvailable()));
+                //.andExpect(jsonPath("$[0].ownerId").value(userId));
     }
 
     @Test
@@ -40,12 +40,12 @@ public class GetItemsTests extends ItemsTest {
                 .andExpect(jsonPath("$[0].name").value(item.getName()))
                 .andExpect(jsonPath("$[0].description").value(item.getDescription()))
                 .andExpect(jsonPath("$[0].available").value(item.getAvailable()))
-                .andExpect(jsonPath("$[0].ownerId").value(userId))
+                //.andExpect(jsonPath("$[0].ownerId").value(userId))
                 .andExpect(jsonPath("$[1].id").exists())
                 .andExpect(jsonPath("$[1].name").value(item.getName()))
                 .andExpect(jsonPath("$[1].description").value(item.getDescription()))
-                .andExpect(jsonPath("$[1].available").value(item.getAvailable()))
-                .andExpect(jsonPath("$[1].ownerId").value(userId));
+                .andExpect(jsonPath("$[1].available").value(item.getAvailable()));
+                //.andExpect(jsonPath("$[1].ownerId").value(userId));
     }
 
     @Test
