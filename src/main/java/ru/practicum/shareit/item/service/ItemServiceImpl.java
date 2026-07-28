@@ -2,10 +2,11 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.item.dto.ReqItemDto;
-import ru.practicum.shareit.item.dto.RespItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -13,7 +14,9 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static ru.practicum.shareit.constant.message.ItemValidMessages.ITEM_NOT_FOUND_MESSAGE;
@@ -24,6 +27,7 @@ import static ru.practicum.shareit.constant.message.ItemValidMessages.ITEM_UPDAT
 public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public RespItemDto getItemById(Long id) {
@@ -33,10 +37,48 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<RespItemDto> getUserItems(Long userId) {
+    public Collection<GetUserItemsDto> getUserItems(Long userId) {
         return itemRepository.findByOwnerId(userId)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(ItemMapper::toGetUserItemsDto)
+                .map(item -> {
+                    //получение списка всех брониований для item
+                    Collection<Booking> itemBookings = bookingRepository.findByItemId(item.getId());
+
+                    //получение ближайшего бронирования для item
+                    Booking nextBooking = itemBookings.stream()
+                            .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                            .min(Comparator.comparing(Booking::getStart))
+                            .orElse(null);
+
+                    //получение самого последнего бронирования для item
+                    Booking lastBooking = itemBookings.stream()
+                            .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                            .max(Comparator.comparing(Booking::getEnd))
+                            .orElse(null);
+
+                    //устанавливаем даты ближайшего бронирования для передачи в dto
+                    if (nextBooking != null) {
+                        item.setNextBooking(
+                                NextBookingDateDto.builder()
+                                        .start(nextBooking.getStart())
+                                        .end(nextBooking.getEnd())
+                                        .build()
+                        );
+                    }
+
+                    //устанавливаем даты самого последнего бронирования для передачи в dto
+                    if (lastBooking != null) {
+                        item.setLastBooking(
+                                LastBookingDateDto.builder()
+                                        .start(lastBooking.getStart())
+                                        .end(lastBooking.getEnd())
+                                        .build()
+                        );
+                    }
+
+                    return item;
+                })
                 .toList();
     }
 

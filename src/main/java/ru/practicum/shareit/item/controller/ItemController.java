@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.GetUserItemsDto;
 import ru.practicum.shareit.item.dto.ReqItemDto;
 import ru.practicum.shareit.item.dto.RespItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -34,7 +35,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<RespItemDto> getUserItems(
+    public Collection<GetUserItemsDto> getUserItems(
             @RequestHeader("X-Sharer-User-Id")
             @NotNull
             @Min(value = 1, message = "ID пользователя должен быть больше 0")
