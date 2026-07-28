@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.booking.dto.RespBookingDto;
-import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.marker.OnCreate;
 
@@ -65,6 +65,6 @@ public class BookingController {
             final Long userId,
             @RequestParam(defaultValue = "ALL") final String state
     ) {
-        return bookingService.getUserBookings(userId, BookingStatus.valueOf(state.toUpperCase()));
+        return bookingService.getUserBookings(userId, BookingState.valueOf(state.toUpperCase()));
     }
 }

@@ -6,14 +6,16 @@ import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.booking.dto.RespBookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -27,6 +29,7 @@ import static ru.practicum.shareit.constant.message.BookingValidMessages.*;
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemService itemService;
+    private final UserService userService;
 
     @Override
     public RespBookingDto getBookingById(Long id, Long userId) {
@@ -34,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
                 .map(BookingMapper::toRespBookingDto)
                 .orElseThrow(() -> new NotFoundException(String.format(BOOKING_NOT_FOUND_MESSAGE, id)));
 
-        if (!booking.getItem().getOwner().getId().equals(userId) || !booking.getBooker().getId().equals(userId)) {
+        if (!booking.getItem().getOwner().getId().equals(userId) && !booking.getBooker().getId().equals(userId)) {
             throw new AccessDeniedException(BOOKING_ACCESS_ERROR);
         }
 
@@ -44,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public RespBookingDto create(ReqBookingDto booking, Long userId) {
         Item item = ItemMapper.toItem(itemService.getItemById(booking.getItemId()));
-        User user = item.getOwner();
+        User user = UserMapper.toUser(userService.getUserById(userId));
         Booking createdBooking = bookingRepository.save(BookingMapper.toBooking(booking, item, user));
         return BookingMapper.toRespBookingDto(createdBooking);
     }
@@ -65,35 +68,35 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
     }
 
-    //ДОБАВИТЬ СОРТИРОВКУ!!!!!!!!!!!!!!!!!
     @Override
-    public Collection<RespBookingDto> getUserBookings(Long userId, BookingStatus state) {
+    public Collection<RespBookingDto> getUserBookings(Long userId, BookingState state) {
         switch (state.toString()) {
             case "ALL" -> {
-                return BookingMapper.toRespBookingDto(bookingRepository.findByBookerId(userId));
+                return BookingMapper.toRespBookingDto(bookingRepository.findByBookerIdOrderByStartDesc(userId));
             }
 
             case "CURRENT" -> {
                 return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(
+                        bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                                 userId, LocalDateTime.now(), LocalDateTime.now()));
             }
 
             case "PAST" -> {
                 return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByBookerIdAndEndIsAfter(userId, LocalDateTime.now()));
+                        bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now()));
             }
 
             case "FUTURE" -> {
                 return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByBookerIdAndStartIsBefore(userId, LocalDateTime.now()));
+                        bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now()));
             }
 
             case "WAITING", "REJECTED" -> {
-                return BookingMapper.toRespBookingDto(bookingRepository.findByBookerIdAndStatus(userId, state));
+                return BookingMapper.toRespBookingDto(bookingRepository
+                        .findByBookerIdAndStatusOrderByStartDesc(userId, state));
             }
 
-            default -> throw new IllegalArgumentException("______________");
+            default -> throw new IllegalArgumentException("Передано несуществуюшее значение состояния заказа");
         }
     }
 
