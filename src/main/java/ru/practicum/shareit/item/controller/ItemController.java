@@ -5,9 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.GetUserItemsDto;
-import ru.practicum.shareit.item.dto.ReqItemDto;
-import ru.practicum.shareit.item.dto.RespItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.marker.OnCreate;
 
@@ -77,5 +75,17 @@ public class ItemController {
             @RequestParam("text") final String text
     ) {
         return itemService.search(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public RespCommentDto create(
+            @RequestHeader("X-Sharer-User-Id")
+            @NotNull
+            @Min(value = 1, message = "ID пользователя должен быть больше 0")
+            final Long userId,
+            @Validated(OnCreate.class) @RequestBody final ReqCommentDto comment,
+            @PathVariable final Long itemId
+    ) {
+        return itemService.create(comment, userId, itemId);
     }
 }

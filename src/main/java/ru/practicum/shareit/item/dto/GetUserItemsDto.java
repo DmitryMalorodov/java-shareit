@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.Collection;
+
 @Data
 @Builder(toBuilder = true)
 public class GetUserItemsDto {
@@ -14,4 +16,5 @@ public class GetUserItemsDto {
     private User owner;
     private NextBookingDateDto nextBooking;
     private LastBookingDateDto lastBooking;
+    private Collection<RespCommentDto> comments;
 }

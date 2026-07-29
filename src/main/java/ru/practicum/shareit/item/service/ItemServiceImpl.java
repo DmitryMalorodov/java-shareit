@@ -7,8 +7,11 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -28,12 +31,18 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public RespItemDto getItemById(Long id) {
-        return itemRepository.findById(id)
+        RespItemDto item = itemRepository.findById(id)
                 .map(ItemMapper::toItemDto)
                 .orElseThrow(() -> new NotFoundException(String.format(ITEM_NOT_FOUND_MESSAGE, id)));
+
+        //получаем и устанавливаем список комментов для найденной вещи
+        Collection<Comment> itemComments = commentRepository.findByItemId(item.getId());
+        item.setComments(CommentMapper.toRespCommentDto(itemComments));
+        return item;
     }
 
     @Override
@@ -42,6 +51,10 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .map(ItemMapper::toGetUserItemsDto)
                 .map(item -> {
+                    //получаем и устанавливаем список комментов для найденной вещи
+                    Collection<Comment> itemComments = commentRepository.findByItemId(item.getId());
+                    item.setComments(CommentMapper.toRespCommentDto(itemComments));
+
                     //получение списка всех брониований для item
                     Collection<Booking> itemBookings = bookingRepository.findByItemId(item.getId());
 
@@ -112,5 +125,25 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .toList();
+    }
+
+    @Override
+    public RespCommentDto create(ReqCommentDto comment, Long userId, Long itemId) {
+        //фильтруем брониования по userId и оставляем только те, которые уже завершились
+        Booking itemBooking = bookingRepository.findByItemId(itemId)
+                .stream()
+                .filter(booking -> booking.getBooker().getId().equals(userId))
+                .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                .findFirst()
+                .orElse(null);
+
+        if (itemBooking == null) {
+            throw new AccessDeniedException("Комментарий может оставлять только пользователь, который брал вещь " +
+                    "в аренду и только после окончания аренды!");
+        }
+
+        Comment createdComment = commentRepository.save(CommentMapper.toComment(
+                comment, itemBooking.getItem(), itemBooking.getBooker()));
+        return CommentMapper.toRespCommentDto(createdComment);
     }
 }
