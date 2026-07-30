@@ -3,7 +3,7 @@ package ru.practicum.shareit.items;
 import ru.practicum.shareit.item.dto.ReqItemDto;
 
 public class ItemData {
-        public static final ReqItemDto item = ReqItemDto.builder()
+    public static final ReqItemDto item = ReqItemDto.builder()
             .name("Имя_111")
             .description("desc")
             .available(true)
