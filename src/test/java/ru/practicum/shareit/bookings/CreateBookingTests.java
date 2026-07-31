@@ -18,12 +18,15 @@ public class CreateBookingTests extends BookingTest {
 
     @Test
     void checkCreateItem() throws Exception {
+        //создание юзера и вещи
         RespUserDto createdUser = createUserDto(user);
         RespItemDto createdItem = createItemDto(item, createdUser.getId());
 
+        //создание брони вещи
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
         RespBookingDto createdBooking = createBookingDto(reqBody, createdUser.getId());
 
+        //проверка соданной брони
         checkBooking(createdBooking, reqBody, createdItem, createdUser, createdUser, BookingStatus.WAITING);
     }
 

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.bookings;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.assertj.core.api.SoftAssertions;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.ShareItTests;
@@ -11,12 +12,17 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.RespUserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.Collection;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.GeneralAssertions.isEqualTo;
 import static ru.practicum.shareit.GeneralAssertions.isNotNull;
-import static ru.practicum.shareit.bookings.BookingData.booking;
 
 public class BookingTest extends ShareItTests {
+    static final String BOOKINGS = "/bookings";
+    static final String BOOKINGS_OWNER = "/bookings/owner";
     static final String BOOKING_ID = "/bookings/{bookingId}";
 
     RespBookingDto getBookingDtoById(Long bookingId, Long userId) throws Exception {
@@ -33,9 +39,37 @@ public class BookingTest extends ShareItTests {
     }
 
     private ResultActions getBookingByIdResAct(Long bookingId, Long userId) throws Exception {
-        return mockMvc.perform(get(BOOKING_ID, bookingId, userId)
-                .header("X-Sharer-User-Id", userId)
-                .content(objectMapper.writeValueAsString(booking)));
+        return mockMvc.perform(get(BOOKING_ID, bookingId)
+                .header("X-Sharer-User-Id", userId));
+    }
+
+    Collection<RespBookingDto> getUserBookings(Long userId, String state) throws Exception {
+        String jsonResponse = mockMvc.perform(get(BOOKINGS)
+                .queryParam("state", state)
+                .header("X-Sharer-User-Id", userId))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+    }
+
+    Collection<RespBookingDto> getUserItemsBookings(Long userId, String state) throws Exception {
+        String jsonResponse = mockMvc.perform(get(BOOKINGS_OWNER)
+                        .queryParam("state", state)
+                        .header("X-Sharer-User-Id", userId))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+    }
+
+    void approveBooking(Long bookingId, String isApproved, Long userId) throws Exception {
+        mockMvc.perform(patch(BOOKING_ID, bookingId)
+                        .queryParam("approved", isApproved)
+                        .header("X-Sharer-User-Id", userId))
+                .andExpect(status().isOk());
     }
 
     void checkBooking(RespBookingDto actBooking, ReqBookingDto expBooking, RespItemDto expItem,
