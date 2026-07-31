@@ -27,9 +27,10 @@ public class BookingTest extends ShareItTests {
 
     RespBookingDto getBookingDtoById(Long bookingId, Long userId) throws Exception {
         String jsonResponse = getBookingByIdResAct(bookingId, userId)
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         return objectMapper.readValue(jsonResponse, RespBookingDto.class);
     }
@@ -47,6 +48,7 @@ public class BookingTest extends ShareItTests {
         String jsonResponse = mockMvc.perform(get(BOOKINGS)
                 .queryParam("state", state)
                 .header("X-Sharer-User-Id", userId))
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -58,6 +60,7 @@ public class BookingTest extends ShareItTests {
         String jsonResponse = mockMvc.perform(get(BOOKINGS_OWNER)
                         .queryParam("state", state)
                         .header("X-Sharer-User-Id", userId))
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -86,12 +89,13 @@ public class BookingTest extends ShareItTests {
         isEqualTo(actBooking.getStatus(), expStatus,
                 "Статус бронирования '%s' не совпадает с ожидаемым '%s'", softAssert);
 
-        checkItem(actBooking.getItem(), expItem, softAssert);
-        checkUser(actBooking.getItem().getOwner(), expOwner, softAssert);
+        checkItem(actBooking.getItem(), expItem, expOwner, softAssert);
         checkUser(actBooking.getBooker(), expBooker, softAssert);
+
+        softAssert.assertAll();
     }
 
-    void checkItem(Item actItem, RespItemDto expItem, SoftAssertions softAssert) {
+    private void checkItem(Item actItem, RespItemDto expItem, RespUserDto expOwner, SoftAssertions softAssert) {
         isEqualTo(actItem.getId(), expItem.getId(),
                 "ID вещи '%d' не совпадает с ожидаемым '%d'", softAssert);
         isEqualTo(actItem.getName(), expItem.getName(),
@@ -100,9 +104,10 @@ public class BookingTest extends ShareItTests {
                 "Описание вещи '%s' не совпадает с ожидаемым '%s'", softAssert);
         isEqualTo(actItem.getAvailable(), expItem.getAvailable(),
                 "Доступность вещи '%b' не совпадает с ожидаемой '%b'", softAssert);
+        checkUser(actItem.getOwner(), expOwner, softAssert);
     }
 
-    void checkUser(User actUser, RespUserDto expUser, SoftAssertions softAssert) {
+    private void checkUser(User actUser, RespUserDto expUser, SoftAssertions softAssert) {
         isEqualTo(actUser.getId(), expUser.getId(),
                 "ID пользователя '%d' не совпадает с ожидаемым '%d'", softAssert);
         isEqualTo(actUser.getName(), expUser.getName(),

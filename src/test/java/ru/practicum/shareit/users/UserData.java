@@ -4,17 +4,17 @@ import ru.practicum.shareit.user.dto.ReqUserDto;
 
 public class UserData {
     public static final ReqUserDto user = ReqUserDto.builder()
-            .name("Имя")
+            .name("name")
             .email("email@em.ru")
             .build();
 
     public static final ReqUserDto user2 = ReqUserDto.builder()
-            .name("Имя2")
+            .name("name2")
             .email("email111@em.ru")
             .build();
 
     public static final ReqUserDto user3 = ReqUserDto.builder()
-            .name("Имя3")
+            .name("name3")
             .email("email333@em.ru")
             .build();
 }

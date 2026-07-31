@@ -1,7 +1,9 @@
 package ru.practicum.shareit;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import org.assertj.core.api.SoftAssertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,9 +18,14 @@ import ru.practicum.shareit.item.dto.RespItemDto;
 import ru.practicum.shareit.user.dto.ReqUserDto;
 import ru.practicum.shareit.user.dto.RespUserDto;
 
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.GeneralAssertions.isEqualTo;
+import static ru.practicum.shareit.GeneralAssertions.isNotNull;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,6 +62,7 @@ public class ShareItTests {
 
 	protected RespUserDto createUserDto(ReqUserDto user) throws Exception {
 		String jsonResponse = createUserResAct(user)
+				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
 				.getContentAsString();
@@ -74,6 +82,7 @@ public class ShareItTests {
 
 	protected RespItemDto createItemDto(ReqItemDto item, Long userId) throws Exception {
 		String jsonResponse = createItemResAct(item, userId)
+				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
 				.getContentAsString();
@@ -94,6 +103,7 @@ public class ShareItTests {
 
 	protected RespBookingDto createBookingDto(ReqBookingDto booking, Long userId) throws Exception {
 		String jsonResponse = createBookingResAct(booking, userId)
+				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
 				.getContentAsString();
@@ -106,5 +116,38 @@ public class ShareItTests {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("X-Sharer-User-Id", userId)
 				.content(objectMapper.writeValueAsString(booking)));
+	}
+
+	protected List<RespUserDto> getUsers() throws Exception {
+		String jsonResponse = mockMvc.perform(get("/users"))
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+		return objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+	}
+
+	protected RespUserDto getUser(Long userId) throws Exception {
+		String jsonResponse = mockMvc.perform(get("/users/{id}", userId))
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+		return objectMapper.readValue(jsonResponse, RespUserDto.class);
+	}
+
+	protected void checkUser(RespUserDto actUser, ReqUserDto expUser) {
+		SoftAssertions softAssert = new SoftAssertions();
+
+		isNotNull(actUser.getId(),
+				"ID пользователя '%d' отсутствует", softAssert);
+		isEqualTo(actUser.getName(), expUser.getName(),
+				"Имя пользователя '%s' не совпадает с ожидаемым '%s'", softAssert);
+		isEqualTo(actUser.getEmail(), expUser.getEmail(),
+				"Email пользователя '%s' не совпадает с ожидаемым '%s'", softAssert);
+
+		softAssert.assertAll();
 	}
 }

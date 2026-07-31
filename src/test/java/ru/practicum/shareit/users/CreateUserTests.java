@@ -3,8 +3,8 @@ package ru.practicum.shareit.users;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.user.dto.ReqUserDto;
+import ru.practicum.shareit.user.dto.RespUserDto;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.constant.message.UserValidationMessages.*;
 import static ru.practicum.shareit.users.UserData.user;
@@ -14,11 +14,8 @@ public class CreateUserTests extends UserTest {
 
     @Test
     void checkCreateUser() throws Exception {
-        createUser(user)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.email").value(user.getEmail()))
-                .andExpect(jsonPath("$.name").value(user.getName()));
+        RespUserDto createdUser = createUserDto(user);
+        checkUser(createdUser, user);
     }
 
     @Test

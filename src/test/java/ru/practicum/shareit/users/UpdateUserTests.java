@@ -3,6 +3,7 @@ package ru.practicum.shareit.users;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.user.dto.ReqUserDto;
+import ru.practicum.shareit.user.dto.RespUserDto;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,11 +18,8 @@ public class UpdateUserTests extends UserTest {
         Long userId = getIdFromObject(createUser(user));
         ReqUserDto newUser = prepareReqBody(user);
 
-        changeUser(newUser, userId)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.email").value(newUser.getEmail()))
-                .andExpect(jsonPath("$.name").value(newUser.getName()));
+        RespUserDto changedUser = changeUserDto(newUser, userId);
+        checkUser(changedUser, newUser);
     }
 
     @Test
