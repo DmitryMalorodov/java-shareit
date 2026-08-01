@@ -22,8 +22,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import static ru.practicum.shareit.constant.message.ItemValidMessages.ITEM_NOT_FOUND_MESSAGE;
-import static ru.practicum.shareit.constant.message.ItemValidMessages.ITEM_UPDATE_ACCESS_MESSAGE;
+import static ru.practicum.shareit.constant.message.ItemValidMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -138,8 +137,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElse(null);
 
         if (itemBooking == null) {
-            throw new AccessDeniedException("Комментарий может оставлять только пользователь, который брал вещь " +
-                    "в аренду и только после окончания аренды!");
+            throw new AccessDeniedException(COMMENT_ACCESS_MESSAGE);
         }
 
         Comment createdComment = commentRepository.save(CommentMapper.toComment(

@@ -13,10 +13,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.booking.dto.RespBookingDto;
+import ru.practicum.shareit.item.dto.GetUserItemsDto;
 import ru.practicum.shareit.item.dto.ReqItemDto;
+import ru.practicum.shareit.item.dto.RespCommentDto;
 import ru.practicum.shareit.item.dto.RespItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.ReqUserDto;
 import ru.practicum.shareit.user.dto.RespUserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
@@ -57,11 +61,13 @@ public class ShareItTests {
 	}
 
 	protected ResultActions createUser(ReqUserDto user) throws Exception {
-		return createUserResAct(user);
+		return mockMvc.perform(post("/users")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(user)));
 	}
 
 	protected RespUserDto createUserDto(ReqUserDto user) throws Exception {
-		String jsonResponse = createUserResAct(user)
+		String jsonResponse = createUser(user)
 				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
@@ -70,18 +76,15 @@ public class ShareItTests {
 		return objectMapper.readValue(jsonResponse, RespUserDto.class);
 	}
 
-	private ResultActions createUserResAct(ReqUserDto user) throws Exception {
-		return mockMvc.perform(post("/users")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(user)));
-	}
-
 	protected ResultActions createItem(ReqItemDto item, Long userId) throws Exception {
-		return createItemResAct(item, userId);
+		return mockMvc.perform(post("/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("X-Sharer-User-Id", userId)
+				.content(objectMapper.writeValueAsString(item)));
 	}
 
 	protected RespItemDto createItemDto(ReqItemDto item, Long userId) throws Exception {
-		String jsonResponse = createItemResAct(item, userId)
+		String jsonResponse = createItem(item, userId)
 				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
@@ -90,32 +93,21 @@ public class ShareItTests {
 		return objectMapper.readValue(jsonResponse, RespItemDto.class);
 	}
 
-	private ResultActions createItemResAct(ReqItemDto item, Long userId) throws Exception {
-		return mockMvc.perform(post("/items")
+	protected ResultActions createBooking(ReqBookingDto booking, Long userId) throws Exception {
+		return mockMvc.perform(post("/bookings")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("X-Sharer-User-Id", userId)
-				.content(objectMapper.writeValueAsString(item)));
-	}
-
-	protected ResultActions createBooking(ReqBookingDto booking, Long userId) throws Exception {
-		return createBookingResAct(booking, userId);
+				.content(objectMapper.writeValueAsString(booking)));
 	}
 
 	protected RespBookingDto createBookingDto(ReqBookingDto booking, Long userId) throws Exception {
-		String jsonResponse = createBookingResAct(booking, userId)
+		String jsonResponse = createBooking(booking, userId)
 				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
 				.getContentAsString();
 
 		return objectMapper.readValue(jsonResponse, RespBookingDto.class);
-	}
-
-	private ResultActions createBookingResAct(ReqBookingDto booking, Long userId) throws Exception {
-		return mockMvc.perform(post("/bookings")
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("X-Sharer-User-Id", userId)
-				.content(objectMapper.writeValueAsString(booking)));
 	}
 
 	protected List<RespUserDto> getUsers() throws Exception {
@@ -149,5 +141,60 @@ public class ShareItTests {
 				"Email пользователя '%s' не совпадает с ожидаемым '%s'", softAssert);
 
 		softAssert.assertAll();
+	}
+
+	protected void checkItem(RespItemDto actItem, ReqItemDto expItem, RespUserDto expOwner, List<RespCommentDto> comments) {
+		SoftAssertions softAssert = new SoftAssertions();
+
+		isNotNull(actItem.getId(), "ID вещи '%d' отсутствует", softAssert);
+		isEqualTo(actItem.getName(), expItem.getName(),
+				"Имя вещи '%s' не совпадает с ожидаемым '%s'", softAssert);
+		isEqualTo(actItem.getDescription(), expItem.getDescription(),
+				"Описание вещи '%s' не совпадает с ожидаемым '%s'", softAssert);
+		isEqualTo(actItem.getAvailable(), expItem.getAvailable(),
+				"Доступность вещи '%b' не совпадает с ожидаемой '%b'", softAssert);
+		isEqualTo(actItem.getComments(), comments,
+				"Список комментариев не совпадает с ожидаемым", softAssert);
+		checkUser(actItem.getOwner(), expOwner, softAssert);
+
+		softAssert.assertAll();
+	}
+
+	protected void checkItem(GetUserItemsDto actItem, ReqItemDto expItem, RespUserDto expOwner, List<RespCommentDto> comments) {
+		SoftAssertions softAssert = new SoftAssertions();
+
+		isNotNull(actItem.getId(), "ID вещи '%d' отсутствует", softAssert);
+		isEqualTo(actItem.getName(), expItem.getName(),
+				"Имя вещи '%s' не совпадает с ожидаемым '%s'", softAssert);
+		isEqualTo(actItem.getDescription(), expItem.getDescription(),
+				"Описание вещи '%s' не совпадает с ожидаемым '%s'", softAssert);
+		isEqualTo(actItem.getAvailable(), expItem.getAvailable(),
+				"Доступность вещи '%b' не совпадает с ожидаемой '%b'", softAssert);
+		isEqualTo(actItem.getComments(), comments,
+				"Список комментариев не совпадает с ожидаемым", softAssert);
+		checkUser(actItem.getOwner(), expOwner, softAssert);
+
+		softAssert.assertAll();
+	}
+
+	protected void checkItem(Item actItem, RespItemDto expItem, RespUserDto expOwner, SoftAssertions softAssert) {
+		isEqualTo(actItem.getId(), expItem.getId(),
+				"ID вещи '%d' не совпадает с ожидаемым '%d'", softAssert);
+		isEqualTo(actItem.getName(), expItem.getName(),
+				"Имя вещи '%s' не совпадает с ожидаемым '%s'", softAssert);
+		isEqualTo(actItem.getDescription(), expItem.getDescription(),
+				"Описание вещи '%s' не совпадает с ожидаемым '%s'", softAssert);
+		isEqualTo(actItem.getAvailable(), expItem.getAvailable(),
+				"Доступность вещи '%b' не совпадает с ожидаемой '%b'", softAssert);
+		checkUser(actItem.getOwner(), expOwner, softAssert);
+	}
+
+	protected void checkUser(User actUser, RespUserDto expUser, SoftAssertions softAssert) {
+		isEqualTo(actUser.getId(), expUser.getId(),
+				"ID пользователя '%d' не совпадает с ожидаемым '%d'", softAssert);
+		isEqualTo(actUser.getName(), expUser.getName(),
+				"Имя пользователя '%s' не совпадает с ожидаемым '%s'", softAssert);
+		isEqualTo(actUser.getEmail(), expUser.getEmail(),
+				"Email пользователя '%s' не совпадает с ожидаемым '%s'", softAssert);
 	}
 }

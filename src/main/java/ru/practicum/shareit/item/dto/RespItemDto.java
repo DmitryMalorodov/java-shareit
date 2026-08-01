@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -17,5 +18,7 @@ public class RespItemDto {
     private String description;
     private Boolean available;
     private User owner;
-    private Collection<RespCommentDto> comments;
+
+    @Builder.Default
+    private Collection<RespCommentDto> comments = new ArrayList<>();
 }
