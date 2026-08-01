@@ -25,7 +25,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleAccessDeniedError(final AccessDeniedException e) {
         return new ErrorResponse(e.getMessage());
     }

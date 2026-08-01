@@ -45,7 +45,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public void approveBooking(
+    public RespBookingDto approveBooking(
             @RequestHeader("X-Sharer-User-Id")
             @NotNull
             @Min(value = 1, message = "ID пользователя должен быть больше 0")
@@ -53,7 +53,7 @@ public class BookingController {
             @PathVariable final Long bookingId,
             @RequestParam final Boolean approved
     ) {
-        bookingService.approveBooking(bookingId, approved, userId);
+        return bookingService.approveBooking(bookingId, approved, userId);
     }
 
     @GetMapping

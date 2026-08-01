@@ -49,12 +49,17 @@ public class BookingServiceImpl implements BookingService {
     public RespBookingDto create(ReqBookingDto booking, Long userId) {
         Item item = ItemMapper.toItem(itemService.getItemById(booking.getItemId()));
         User user = UserMapper.toUser(userService.getUserById(userId));
+
+        if (!item.getAvailable()) {
+            throw new ValidationException("Невозможно забронировать недоступную вещь!");
+        }
+
         Booking createdBooking = bookingRepository.save(BookingMapper.toBooking(booking, item, user));
         return BookingMapper.toRespBookingDto(createdBooking);
     }
 
     @Override
-    public void approveBooking(Long bookingId, Boolean approved, Long userId) {
+    public RespBookingDto approveBooking(Long bookingId, Boolean approved, Long userId) {
         Booking booking = BookingMapper.toBooking(getBookingById(bookingId, userId));
 
         if (!booking.getItem().getOwner().getId().equals(userId)) {
@@ -66,7 +71,8 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(REJECTED);
         }
-        bookingRepository.save(booking);
+        Booking createdBooking = bookingRepository.save(booking);
+        return BookingMapper.toRespBookingDto(createdBooking);
     }
 
     @Override
@@ -103,6 +109,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Collection<RespBookingDto> getUserItemsBookings(Long userId, String state) {
+        if (itemService.getUserItems(userId).isEmpty()){
+            throw new NotFoundException("У пользователя нет ни одной вещи!");
+        }
+
         switch (state) {
             case "ALL" -> {
                 return BookingMapper.toRespBookingDto(bookingRepository

@@ -62,11 +62,16 @@ public class BookingTest extends ShareItTests {
         return objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     }
 
-    void approveBooking(Long bookingId, String isApproved, Long userId) throws Exception {
-        mockMvc.perform(patch(BOOKING_ID, bookingId)
+    RespBookingDto approveBooking(Long bookingId, String isApproved, Long userId) throws Exception {
+        String jsonResponse = mockMvc.perform(patch(BOOKING_ID, bookingId)
                         .queryParam("approved", isApproved)
                         .header("X-Sharer-User-Id", userId))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return objectMapper.readValue(jsonResponse, RespBookingDto.class);
     }
 
     void checkBooking(RespBookingDto actBooking, ReqBookingDto expBooking, RespItemDto expItem,

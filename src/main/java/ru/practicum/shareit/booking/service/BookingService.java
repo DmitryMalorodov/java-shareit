@@ -10,7 +10,7 @@ public interface BookingService {
 
     RespBookingDto create(ReqBookingDto booking, Long userId);
 
-    void approveBooking(Long bookingId, Boolean approved, Long userId);
+    RespBookingDto approveBooking(Long bookingId, Boolean approved, Long userId);
 
     //получение списка бронирований, которые сделал пользователь
     Collection<RespBookingDto> getUserBookings(Long userId, String state);

@@ -18,7 +18,6 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .owner(item.getOwner())
-                //.request(item.getRequest())
                 .build();
     }
 
@@ -29,18 +28,16 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .owner(item.getOwner())
-                //.request(item.getRequest())
                 .build();
     }
 
-    public static Item toItem(RespItemDto item) {
+    public static Item toItem(GetUserItemsDto getUserItemsDto) {
         return Item.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .owner(item.getOwner())
-                //.request(item.getRequest())
+                .id(getUserItemsDto.getId())
+                .name(getUserItemsDto.getName())
+                .description(getUserItemsDto.getDescription())
+                .available(getUserItemsDto.getAvailable())
+                .owner(getUserItemsDto.getOwner())
                 .build();
     }
 

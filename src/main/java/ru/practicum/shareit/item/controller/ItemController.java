@@ -22,7 +22,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/{itemId}")
-    public RespItemDto getItemById(
+    public GetUserItemsDto getItemById(
             @RequestHeader("X-Sharer-User-Id")
             @NotNull
             @Min(value = 1, message = "ID пользователя должен быть больше 0")

@@ -43,11 +43,10 @@ public class ApproveBookingTests extends BookingTest {
         RespBookingDto createdBooking = createBookingDto(reqBody, createdUser2.getId());
 
         //одобрение брони
-        approveBooking(createdBooking.getId(), isApproved, createdUser.getId());
+        RespBookingDto approvedBooking = approveBooking(createdBooking.getId(), isApproved, createdUser.getId());
 
         //проверка успшности одобрения брони
-        RespBookingDto receivedBooking = getBookingDtoById(createdBooking.getId(), createdUser2.getId());
-        GeneralAssertions.isEqualTo(receivedBooking.getStatus(), status,
+        GeneralAssertions.isEqualTo(approvedBooking.getStatus(), status,
                 "Статус бронирования '%s' отличается от ожидаемого '%s'");
     }
 

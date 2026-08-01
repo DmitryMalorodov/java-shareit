@@ -6,6 +6,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -33,14 +34,13 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     @Override
-    public RespItemDto getItemById(Long id) {
-        RespItemDto item = itemRepository.findById(id)
-                .map(ItemMapper::toItemDto)
+    public GetUserItemsDto getItemById(Long id) {
+        GetUserItemsDto item = itemRepository.findById(id)
+                .map(ItemMapper::toGetUserItemsDto)
                 .orElseThrow(() -> new NotFoundException(String.format(ITEM_NOT_FOUND_MESSAGE, id)));
 
-        //получаем и устанавливаем список комментов для найденной вещи
-        Collection<Comment> itemComments = commentRepository.findByItemId(item.getId());
-        item.setComments(CommentMapper.toRespCommentDto(itemComments));
+        setCommentsToItem(item);
+        setNextAndLastBookingToItem(item);
         return item;
     }
 
@@ -50,45 +50,8 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .map(ItemMapper::toGetUserItemsDto)
                 .map(item -> {
-                    //получаем и устанавливаем список комментов для найденной вещи
-                    Collection<Comment> itemComments = commentRepository.findByItemId(item.getId());
-                    item.setComments(CommentMapper.toRespCommentDto(itemComments));
-
-                    //получение списка всех брониований для item
-                    Collection<Booking> itemBookings = bookingRepository.findByItemId(item.getId());
-
-                    //получение ближайшего бронирования для item
-                    Booking nextBooking = itemBookings.stream()
-                            .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
-                            .min(Comparator.comparing(Booking::getStart))
-                            .orElse(null);
-
-                    //получение самого последнего бронирования для item
-                    Booking lastBooking = itemBookings.stream()
-                            .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
-                            .max(Comparator.comparing(Booking::getEnd))
-                            .orElse(null);
-
-                    //устанавливаем даты ближайшего бронирования для передачи в dto
-                    if (nextBooking != null) {
-                        item.setNextBooking(
-                                NextBookingDateDto.builder()
-                                        .start(nextBooking.getStart())
-                                        .end(nextBooking.getEnd())
-                                        .build()
-                        );
-                    }
-
-                    //устанавливаем даты самого последнего бронирования для передачи в dto
-                    if (lastBooking != null) {
-                        item.setLastBooking(
-                                LastBookingDateDto.builder()
-                                        .start(lastBooking.getStart())
-                                        .end(lastBooking.getEnd())
-                                        .build()
-                        );
-                    }
-
+                    setCommentsToItem(item);
+                    setNextAndLastBookingToItem(item);
                     return item;
                 })
                 .toList();
@@ -103,8 +66,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public RespItemDto update(ReqItemDto newItem, Long userId, Long itemId) {
-        RespItemDto item = getItemById(itemId);
-        Item oldItem = ItemMapper. toItem(item);
+        GetUserItemsDto item = getItemById(itemId);
+        Item oldItem = ItemMapper.toItem(item);
         if (!oldItem.getOwner().getId().equals(userId))
             throw new AccessDeniedException(ITEM_UPDATE_ACCESS_MESSAGE);
 
@@ -137,11 +100,55 @@ public class ItemServiceImpl implements ItemService {
                 .orElse(null);
 
         if (itemBooking == null) {
-            throw new AccessDeniedException(COMMENT_ACCESS_MESSAGE);
+            throw new ValidationException(COMMENT_ACCESS_MESSAGE);
         }
 
         Comment createdComment = commentRepository.save(CommentMapper.toComment(
                 comment, itemBooking.getItem(), itemBooking.getBooker()));
         return CommentMapper.toRespCommentDto(createdComment);
+    }
+
+    private void setCommentsToItem(GetUserItemsDto item) {
+        //получаем и устанавливаем список комментов для найденной вещи
+        Collection<Comment> itemComments = commentRepository.findByItemId(item.getId());
+        item.setComments(CommentMapper.toRespCommentDto(itemComments));
+    }
+
+    private void setNextAndLastBookingToItem(GetUserItemsDto item) {
+        //получение списка всех брониований для item
+        Collection<Booking> itemBookings = bookingRepository.findByItemId(item.getId());
+        LocalDateTime now = LocalDateTime.now();
+
+        //получение ближайшего бронирования для item
+        Booking nextBooking = itemBookings.stream()
+                .filter(booking -> booking.getStart().isAfter(now))
+                .min(Comparator.comparing(Booking::getStart))
+                .orElse(null);
+
+        //получение самого последнего бронирования для item
+        Booking lastBooking = itemBookings.stream()
+                .filter(booking -> !booking.getStart().isBefore(now))
+                .max(Comparator.comparing(Booking::getStart))
+                .orElse(null);
+
+        //устанавливаем даты ближайшего бронирования для передачи в dto
+        if (nextBooking != null) {
+            item.setNextBooking(
+                    NextBookingDateDto.builder()
+                            .start(nextBooking.getStart())
+                            .end(nextBooking.getEnd())
+                            .build()
+            );
+        }
+
+        //устанавливаем даты самого последнего бронирования для передачи в dto
+        if (lastBooking != null) {
+            item.setLastBooking(
+                    LastBookingDateDto.builder()
+                            .start(lastBooking.getStart())
+                            .end(lastBooking.getEnd())
+                            .build()
+            );
+        }
     }
 }
