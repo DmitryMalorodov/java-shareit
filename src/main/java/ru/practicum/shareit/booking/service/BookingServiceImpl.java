@@ -47,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public RespBookingDto create(ReqBookingDto booking, Long userId) {
-        Item item = ItemMapper.toItem(itemService.getItemById(booking.getItemId()));
+        Item item = ItemMapper.toItem(itemService.getItemById(booking.getItemId(), userId));
         User user = UserMapper.toUser(userService.getUserById(userId));
 
         if (!item.getAvailable()) {

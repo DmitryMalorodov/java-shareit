@@ -34,13 +34,16 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     @Override
-    public GetUserItemsDto getItemById(Long id) {
+    public GetUserItemsDto getItemById(Long id, Long userId) {
         GetUserItemsDto item = itemRepository.findById(id)
                 .map(ItemMapper::toGetUserItemsDto)
                 .orElseThrow(() -> new NotFoundException(String.format(ITEM_NOT_FOUND_MESSAGE, id)));
 
         setCommentsToItem(item);
-        setNextAndLastBookingToItem(item);
+        if (item.getOwner().getId().equals(userId)) {
+            setNextAndLastBookingToItem(item);
+        }
+
         return item;
     }
 
@@ -66,7 +69,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public RespItemDto update(ReqItemDto newItem, Long userId, Long itemId) {
-        GetUserItemsDto item = getItemById(itemId);
+        GetUserItemsDto item = getItemById(itemId, userId);
         Item oldItem = ItemMapper.toItem(item);
         if (!oldItem.getOwner().getId().equals(userId))
             throw new AccessDeniedException(ITEM_UPDATE_ACCESS_MESSAGE);
@@ -127,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
 
         //получение самого последнего бронирования для item
         Booking lastBooking = itemBookings.stream()
-                .filter(booking -> !booking.getStart().isBefore(now))
+                .filter(booking -> !booking.getStart().isAfter(now))
                 .max(Comparator.comparing(Booking::getStart))
                 .orElse(null);
 

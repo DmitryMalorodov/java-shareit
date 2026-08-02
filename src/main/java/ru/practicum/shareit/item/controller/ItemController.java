@@ -29,7 +29,7 @@ public class ItemController {
             final Long userId,
             @PathVariable final Long itemId
     ) {
-        return itemService.getItemById(itemId);
+        return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping
