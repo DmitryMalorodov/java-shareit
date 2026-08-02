@@ -20,39 +20,39 @@ public class CreateCommentTests extends ItemsTest {
     @Test
     void checkCreateComment() throws Exception {
         //создание юзера и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
+        RespUserDto createdUser = createUser(user);
+        RespItemDto createdItem = createItem(item, createdUser.getId());
 
         //создание брони вещи
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        createBookingDto(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
 
         //создание и проверка комментария
-        RespCommentDto createdComment = createCommentDto(comment, createdUser.getId(), createdItem.getId());
-        checkComment(createdComment, comment, createdItem, createdUser);
+        RespCommentDto createdComment = createComment(comment, createdUser.getId(), createdItem.getId());
+        checkComment(createdComment, comment, createdUser);
     }
 
     @Test
     void checkCreateCommentDuringUseItem() throws Exception {
         //создание юзера и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
+        RespUserDto createdUser = createUser(user);
+        RespItemDto createdItem = createItem(item, createdUser.getId());
 
         //создание брони вещи
         ReqBookingDto reqBody = booking3.toBuilder().itemId(createdItem.getId()).build();
-        createBookingDto(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
 
         //создание и проверка комментария
-        checkNotFoundError(createComment(comment, createdUser.getId(), createdItem.getId()), COMMENT_ACCESS_MESSAGE);
+        checkValidationError(createCommentResAct(comment, createdUser.getId(), createdItem.getId()), COMMENT_ACCESS_MESSAGE);
     }
 
     @Test
     void checkCreateCommentWithoutBooking() throws Exception {
         //создание юзера и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
+        RespUserDto createdUser = createUser(user);
+        RespItemDto createdItem = createItem(item, createdUser.getId());
 
         //создание и проверка комментария
-        checkNotFoundError(createComment(comment, createdUser.getId(), createdItem.getId()), COMMENT_ACCESS_MESSAGE);
+        checkValidationError(createCommentResAct(comment, createdUser.getId(), createdItem.getId()), COMMENT_ACCESS_MESSAGE);
     }
 }

@@ -53,6 +53,12 @@ public class ShareItTests {
 				.andExpect(jsonPath("$.error").value(expMessage));
 	}
 
+	protected void checkForbiddenError(ResultActions response, String expMessage) throws Exception {
+		response
+				.andExpect(status().isForbidden())
+				.andExpect(jsonPath("$.error").value(expMessage));
+	}
+
 	protected Long getIdFromObject(ResultActions response) throws Exception {
 		return JsonPath.parse(response
 				.andReturn()
@@ -60,14 +66,14 @@ public class ShareItTests {
 				.getContentAsString()).read("$.id", Long.class);
 	}
 
-	protected ResultActions createUser(ReqUserDto user) throws Exception {
+	protected ResultActions createUserResAct(ReqUserDto user) throws Exception {
 		return mockMvc.perform(post("/users")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(user)));
 	}
 
-	protected RespUserDto createUserDto(ReqUserDto user) throws Exception {
-		String jsonResponse = createUser(user)
+	protected RespUserDto createUser(ReqUserDto user) throws Exception {
+		String jsonResponse = createUserResAct(user)
 				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
@@ -76,15 +82,15 @@ public class ShareItTests {
 		return objectMapper.readValue(jsonResponse, RespUserDto.class);
 	}
 
-	protected ResultActions createItem(ReqItemDto item, Long userId) throws Exception {
+	protected ResultActions createItemResAct(ReqItemDto item, Long userId) throws Exception {
 		return mockMvc.perform(post("/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("X-Sharer-User-Id", userId)
 				.content(objectMapper.writeValueAsString(item)));
 	}
 
-	protected RespItemDto createItemDto(ReqItemDto item, Long userId) throws Exception {
-		String jsonResponse = createItem(item, userId)
+	protected RespItemDto createItem(ReqItemDto item, Long userId) throws Exception {
+		String jsonResponse = createItemResAct(item, userId)
 				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()
@@ -93,15 +99,15 @@ public class ShareItTests {
 		return objectMapper.readValue(jsonResponse, RespItemDto.class);
 	}
 
-	protected ResultActions createBooking(ReqBookingDto booking, Long userId) throws Exception {
+	protected ResultActions createBookingResAct(ReqBookingDto booking, Long userId) throws Exception {
 		return mockMvc.perform(post("/bookings")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("X-Sharer-User-Id", userId)
 				.content(objectMapper.writeValueAsString(booking)));
 	}
 
-	protected RespBookingDto createBookingDto(ReqBookingDto booking, Long userId) throws Exception {
-		String jsonResponse = createBooking(booking, userId)
+	protected RespBookingDto createBooking(ReqBookingDto booking, Long userId) throws Exception {
+		String jsonResponse = createBookingResAct(booking, userId)
 				.andExpect(status().isOk())
 				.andReturn()
 				.getResponse()

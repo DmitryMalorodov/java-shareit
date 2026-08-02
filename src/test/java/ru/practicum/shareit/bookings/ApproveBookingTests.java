@@ -14,7 +14,6 @@ import ru.practicum.shareit.user.dto.RespUserDto;
 
 import java.util.stream.Stream;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.bookings.BookingData.booking;
 import static ru.practicum.shareit.items.ItemData.item;
@@ -34,13 +33,13 @@ public class ApproveBookingTests extends BookingTest {
     @MethodSource("getData")
     void checkApproveBooking(String isApproved, BookingStatus status) throws Exception {
         //создание юзеров и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespUserDto createdUser2 = createUserDto(user2);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
+        RespUserDto createdUser = createUser(user);
+        RespUserDto createdUser2 = createUser(user2);
+        RespItemDto createdItem = createItem(item, createdUser.getId());
 
         //создание брони на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        RespBookingDto createdBooking = createBookingDto(reqBody, createdUser2.getId());
+        RespBookingDto createdBooking = createBooking(reqBody, createdUser2.getId());
 
         //одобрение брони
         RespBookingDto approvedBooking = approveBooking(createdBooking.getId(), isApproved, createdUser.getId());
@@ -53,19 +52,17 @@ public class ApproveBookingTests extends BookingTest {
     @Test
     void checkApproveByNotItemOwner() throws Exception {
         //создание юзеров и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespUserDto createdUser2 = createUserDto(user2);
-        RespUserDto createdUser3 = createUserDto(user3);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
+        RespUserDto createdUser = createUser(user);
+        RespUserDto createdUser2 = createUser(user2);
+        RespUserDto createdUser3 = createUser(user3);
+        RespItemDto createdItem = createItem(item, createdUser.getId());
 
         //создание брони на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        RespBookingDto createdBooking = createBookingDto(reqBody, createdUser2.getId());
+        RespBookingDto createdBooking = createBooking(reqBody, createdUser2.getId());
 
         //попытка одобрение брони и проверка отказа
-        mockMvc.perform(patch(BOOKING_ID, createdBooking.getId())
-                        .queryParam("approved", "true")
-                        .header("X-Sharer-User-Id", createdUser3.getId()))
-                .andExpect(status().isNotFound());
+        approveBookingResAct(createdBooking.getId(), "true", createdUser3.getId())
+                .andExpect(status().isForbidden());
     }
 }

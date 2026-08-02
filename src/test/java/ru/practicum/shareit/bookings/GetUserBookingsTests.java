@@ -1,5 +1,6 @@
 package ru.practicum.shareit.bookings;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.GeneralAssertions;
@@ -18,18 +19,23 @@ import static ru.practicum.shareit.users.UserData.user2;
 
 @DisplayName("Проверка получения бронирований пользователя")
 public class GetUserBookingsTests extends BookingTest {
+    private RespUserDto createdUser;
+    private RespUserDto createdUser2;
+    private RespItemDto createdItem;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        createdUser = createUser(user);
+        createdUser2 = createUser(user2);
+        createdItem = createItem(item, createdUser2.getId());
+    }
 
     @Test
     void checkGetUserBookings() throws Exception {
-        //создание юзеров и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespUserDto createdUser2 = createUserDto(user2);
-        RespItemDto createdItem = createItemDto(item, createdUser2.getId());
-
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        createBookingDto(reqBody, createdUser.getId());
-        createBookingDto(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "all");
@@ -40,15 +46,10 @@ public class GetUserBookingsTests extends BookingTest {
 
     @Test
     void checkGetUserBookingsByItemOwner() throws Exception {
-        //создание юзеров и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespUserDto createdUser2 = createUserDto(user2);
-        RespItemDto createdItem = createItemDto(item, createdUser2.getId());
-
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        createBookingDto(reqBody, createdUser.getId());
-        createBookingDto(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser2.getId(), "all");
@@ -57,15 +58,10 @@ public class GetUserBookingsTests extends BookingTest {
 
     @Test
     void checkGetUserBookingsWaiting() throws Exception {
-        //создание юзеров и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespUserDto createdUser2 = createUserDto(user2);
-        RespItemDto createdItem = createItemDto(item, createdUser2.getId());
-
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        createBookingDto(reqBody, createdUser.getId());
-        createBookingDto(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "waiting");
@@ -75,15 +71,10 @@ public class GetUserBookingsTests extends BookingTest {
 
     @Test
     void checkGetUserBookingsPast() throws Exception {
-        //создание юзеров и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespUserDto createdUser2 = createUserDto(user2);
-        RespItemDto createdItem = createItemDto(item, createdUser2.getId());
-
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        createBookingDto(reqBody, createdUser.getId());
-        createBookingDto(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "past");
@@ -93,16 +84,11 @@ public class GetUserBookingsTests extends BookingTest {
 
     @Test
     void checkGetUserBookingsFuture() throws Exception {
-        //создание юзеров и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespUserDto createdUser2 = createUserDto(user2);
-        RespItemDto createdItem = createItemDto(item, createdUser2.getId());
-
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
         ReqBookingDto reqBody2 = booking2.toBuilder().itemId(createdItem.getId()).build();
-        createBookingDto(reqBody, createdUser.getId());
-        createBookingDto(reqBody2, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
+        createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "future");
@@ -112,16 +98,11 @@ public class GetUserBookingsTests extends BookingTest {
 
     @Test
     void checkGetUserBookingsCurrent() throws Exception {
-        //создание юзеров и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespUserDto createdUser2 = createUserDto(user2);
-        RespItemDto createdItem = createItemDto(item, createdUser2.getId());
-
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
         ReqBookingDto reqBody2 = booking3.toBuilder().itemId(createdItem.getId()).build();
-        createBookingDto(reqBody, createdUser.getId());
-        createBookingDto(reqBody2, createdUser.getId());
+        createBooking(reqBody, createdUser.getId());
+        createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "current");

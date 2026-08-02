@@ -9,4 +9,5 @@ public class BookingValidMessages {
             " либо владелец вещи данного бронирования";
     public static final String BOOKING_APPROVED_ACCESS_ERROR = "Статус бронирования может менять только владелец " +
             "вещи данного бронирования";
+    public static final String USER_DO_NOT_HAVE_ANY_ITEM = "У пользователя нет ни одной вещи!";
 }

@@ -21,15 +21,15 @@ public class ItemsTest extends ShareItTests {
     static final String ITEMS_SEARCH = "/items/search";
     static final String COMMENT = "/items/{itemId}/comment";
 
-    ResultActions changeItem(ReqItemDto item, Long userId, Long itemId) throws Exception {
+    ResultActions changeItemResAct(ReqItemDto item, Long userId, Long itemId) throws Exception {
         return mockMvc.perform(patch(ITEMS_ID, itemId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Sharer-User-Id", userId)
                 .content(objectMapper.writeValueAsString(item)));
     }
 
-    RespItemDto changeItemDto(ReqItemDto item, Long userId, Long itemId) throws Exception {
-        String jsonResponse = changeItem(item, userId, itemId)
+    RespItemDto changeItem(ReqItemDto item, Long userId, Long itemId) throws Exception {
+        String jsonResponse = changeItemResAct(item, userId, itemId)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -38,15 +38,15 @@ public class ItemsTest extends ShareItTests {
         return objectMapper.readValue(jsonResponse, RespItemDto.class);
     }
 
-    ResultActions createComment(ReqCommentDto comment, Long userId, Long itemId) throws Exception {
+    ResultActions createCommentResAct(ReqCommentDto comment, Long userId, Long itemId) throws Exception {
         return mockMvc.perform(post(COMMENT, itemId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Sharer-User-Id", userId)
                 .content(objectMapper.writeValueAsString(comment)));
     }
 
-    RespCommentDto createCommentDto(ReqCommentDto comment, Long userId, Long itemId) throws Exception {
-        String jsonResponse = createComment(comment, userId, itemId)
+    RespCommentDto createComment(ReqCommentDto comment, Long userId, Long itemId) throws Exception {
+        String jsonResponse = createCommentResAct(comment, userId, itemId)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -93,7 +93,7 @@ public class ItemsTest extends ShareItTests {
         return objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     }
 
-    void checkComment(RespCommentDto actComment, ReqCommentDto expComment, RespItemDto expItem, RespUserDto expUser) {
+    void checkComment(RespCommentDto actComment, ReqCommentDto expComment, RespUserDto expUser) {
         SoftAssertions softAssert = new SoftAssertions();
 
         isNotNull(actComment.getId(), "ID комментария '%d' отсутствует", softAssert);
@@ -101,8 +101,8 @@ public class ItemsTest extends ShareItTests {
                 "Текст комментария '%s' не соответствует ожидаемому '%s'", softAssert);
         isCloseTo(actComment.getCreated(), LocalDateTime.now(),
                 "Дата/Время создания комментария '%s' не соответствует ожидаемому '%s'", softAssert);
-        checkItem(actComment.getItem(), expItem, expUser, softAssert);
-        checkUser(actComment.getAuthor(), expUser, softAssert);
+        isEqualTo(actComment.getAuthorName(), expUser.getName(),
+                "Имя автора комментария '%s' не соответствует ожидаемому '%s'", softAssert);
 
         softAssert.assertAll();
     }

@@ -30,6 +30,4 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
-
-    //private ItemRequest request;
 }

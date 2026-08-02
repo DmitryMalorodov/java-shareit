@@ -1,5 +1,6 @@
 package ru.practicum.shareit.items;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.GeneralAssertions;
@@ -13,14 +14,18 @@ import static ru.practicum.shareit.users.UserData.user;
 
 @DisplayName("Проверка поиска вещи")
 public class SearchItemTests extends ItemsTest {
+    private RespUserDto createdUser;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        createdUser = createUser(user);
+        createItemResAct(item, createdUser.getId());
+        createItemResAct(item2, createdUser.getId());
+        createItemResAct(item3, createdUser.getId());
+    }
 
     @Test
     void checkSearchItemOnlyAvailable() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        createItem(item, createdUser.getId());
-        createItem(item2, createdUser.getId());
-        createItem(item3, createdUser.getId());
-
         List<RespItemDto> foundItems = search(createdUser.getId(), "des");
         GeneralAssertions.isTrue(foundItems.size() == 1,
                 "Размер списка вещей не соответствует ожидаемому");
@@ -29,11 +34,6 @@ public class SearchItemTests extends ItemsTest {
 
     @Test
     void checkSearchItemByName() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        createItem(item, createdUser.getId());
-        createItem(item2, createdUser.getId());
-        createItem(item3, createdUser.getId());
-
         List<RespItemDto> foundItems = search(createdUser.getId(), "NAm");
         GeneralAssertions.isTrue(foundItems.size() == 1,
                 "Размер списка вещей не соответствует ожидаемому");
@@ -42,11 +42,6 @@ public class SearchItemTests extends ItemsTest {
 
     @Test
     void checkSearchItemByNameAndDescription() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        createItem(item, createdUser.getId());
-        createItem(item2, createdUser.getId());
-        createItem(item3, createdUser.getId());
-
         List<RespItemDto> foundItems = search(createdUser.getId(), "111");
         GeneralAssertions.isTrue(foundItems.size() == 2,
                 "Размер списка вещей не соответствует ожидаемому");
@@ -56,11 +51,6 @@ public class SearchItemTests extends ItemsTest {
 
     @Test
     void checkSearchItemByBlank() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        createItem(item, createdUser.getId());
-        createItem(item2, createdUser.getId());
-        createItem(item3, createdUser.getId());
-
         List<RespItemDto> foundItems = search(createdUser.getId(), " ");
         GeneralAssertions.isTrue(foundItems.isEmpty(),
                 "Размер списка вещей не соответствует ожидаемому");

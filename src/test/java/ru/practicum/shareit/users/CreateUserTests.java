@@ -14,38 +14,38 @@ public class CreateUserTests extends UserTest {
 
     @Test
     void checkCreateUser() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
+        RespUserDto createdUser = createUser(user);
         checkUser(createdUser, user);
     }
 
     @Test
     void checkEmailNullValidation() throws Exception {
         ReqUserDto userEmailNull = user.toBuilder().email(null).build();
-        checkValidationError(createUser(userEmailNull), EMAIL_BLANK_MESSAGE);
+        checkValidationError(createUserResAct(userEmailNull), EMAIL_BLANK_MESSAGE);
     }
 
     @Test
     void checkEmailNotCorrectValidation() throws Exception {
         ReqUserDto userEmailNotCorrect = user.toBuilder().email("email").build();
-        checkValidationError(createUser(userEmailNotCorrect), EMAIL_NOT_CORRECT_MESSAGE);
+        checkValidationError(createUserResAct(userEmailNotCorrect), EMAIL_NOT_CORRECT_MESSAGE);
     }
 
     @Test
     void checkNameNullValidation() throws Exception {
         ReqUserDto userEmailNull = user.toBuilder().name(null).build();
-        checkValidationError(createUser(userEmailNull), NAME_BLANK_MESSAGE);
+        checkValidationError(createUserResAct(userEmailNull), NAME_BLANK_MESSAGE);
     }
 
     @Test
     void checkNameBlankValidation() throws Exception {
         ReqUserDto userEmailNull = user.toBuilder().name(" ").build();
-        checkValidationError(createUser(userEmailNull), NAME_BLANK_MESSAGE);
+        checkValidationError(createUserResAct(userEmailNull), NAME_BLANK_MESSAGE);
     }
 
     @Test
     void checkCreateUserWithExistedEmailValidation() throws Exception {
-        createUser(user);
-        createUser(user)
+        createUserResAct(user);
+        createUserResAct(user)
                 .andExpect(status().isConflict());
     }
 }

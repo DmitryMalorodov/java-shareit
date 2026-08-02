@@ -71,6 +71,7 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(REJECTED);
         }
+
         Booking createdBooking = bookingRepository.save(booking);
         return BookingMapper.toRespBookingDto(createdBooking);
     }
@@ -109,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Collection<RespBookingDto> getUserItemsBookings(Long userId, String state) {
-        if (itemService.getUserItems(userId).isEmpty()){
+        if (itemService.getUserItems(userId).isEmpty()) {
             throw new NotFoundException("У пользователя нет ни одной вещи!");
         }
 

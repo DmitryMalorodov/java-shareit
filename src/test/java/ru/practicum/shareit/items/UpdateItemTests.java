@@ -17,23 +17,23 @@ public class UpdateItemTests extends ItemsTest {
 
     @Test
     void checkChangeItem() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        Long itemId = getIdFromObject(createItem(item, createdUser.getId()));
+        RespUserDto createdUser = createUser(user);
+        Long itemId = getIdFromObject(createItemResAct(item, createdUser.getId()));
         ReqItemDto newItem = prepareReqBody(item);
 
-        RespItemDto changedItem = changeItemDto(newItem, createdUser.getId(), itemId);
+        RespItemDto changedItem = changeItem(newItem, createdUser.getId(), itemId);
         checkItem(changedItem, newItem, createdUser, List.of());
     }
 
     @Test
     void checkChangeItemWithOtherUser() throws Exception {
-        Long userId = getIdFromObject(createUser(user));
+        Long userId = getIdFromObject(createUserResAct(user));
         Long randomUserId = 100L;
 
-        Long itemId = getIdFromObject(createItem(item, userId));
+        Long itemId = getIdFromObject(createItemResAct(item, userId));
         ReqItemDto newItem = prepareReqBody(item);
 
-        checkNotFoundError(changeItem(newItem, randomUserId, itemId), ITEM_UPDATE_ACCESS_MESSAGE);
+        checkForbiddenError(changeItemResAct(newItem, randomUserId, itemId), ITEM_UPDATE_ACCESS_MESSAGE);
     }
 
     private ReqItemDto prepareReqBody(ReqItemDto item) {

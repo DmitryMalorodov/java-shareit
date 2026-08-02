@@ -16,8 +16,8 @@ public class GetItemsTests extends ItemsTest {
 
     @Test
     void checkGettingOneItem() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        createItem(item, createdUser.getId());
+        RespUserDto createdUser = createUser(user);
+        createItemResAct(item, createdUser.getId());
 
         List<GetUserItemsDto> items = getItems(createdUser.getId());
         GeneralAssertions.isTrue(items.size() == 1,
@@ -27,9 +27,9 @@ public class GetItemsTests extends ItemsTest {
 
     @Test
     void checkGettingTwoItems() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        createItem(item, createdUser.getId());
-        createItem(item, createdUser.getId());
+        RespUserDto createdUser = createUser(user);
+        createItemResAct(item, createdUser.getId());
+        createItemResAct(item, createdUser.getId());
 
         List<GetUserItemsDto> items = getItems(createdUser.getId());
         GeneralAssertions.isTrue(items.size() == 2,
@@ -40,7 +40,7 @@ public class GetItemsTests extends ItemsTest {
 
     @Test
     void checkGettingNoOneItem() throws Exception {
-        Long userId = getIdFromObject(createUser(user));
+        Long userId = getIdFromObject(createUserResAct(user));
 
         List<GetUserItemsDto> items = getItems(userId);
         GeneralAssertions.isTrue(items.isEmpty(),

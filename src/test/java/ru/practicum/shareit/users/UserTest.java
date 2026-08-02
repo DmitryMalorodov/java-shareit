@@ -13,14 +13,14 @@ public class UserTest extends ShareItTests {
     static final String USERS = "/users";
     static final String USERS_ID = "/users/{id}";
 
-    ResultActions changeUser(ReqUserDto user, Long userId) throws Exception {
+    ResultActions changeUserResAct(ReqUserDto user, Long userId) throws Exception {
         return mockMvc.perform(patch(USERS_ID, userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)));
     }
 
-    RespUserDto changeUserDto(ReqUserDto user, Long userId) throws Exception {
-        String jsonResponse = changeUser(user, userId)
+    RespUserDto changeUser(ReqUserDto user, Long userId) throws Exception {
+        String jsonResponse = changeUserResAct(user, userId)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()

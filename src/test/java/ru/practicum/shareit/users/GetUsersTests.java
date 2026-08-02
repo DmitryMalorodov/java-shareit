@@ -18,7 +18,7 @@ public class GetUsersTests extends UserTest {
 
     @Test
     void checkGettingOneUser() throws Exception {
-        createUser(user);
+        createUserResAct(user);
 
         Collection<RespUserDto> users = getUsers();
         for (RespUserDto u : users) {
@@ -28,8 +28,8 @@ public class GetUsersTests extends UserTest {
 
     @Test
     void checkGettingTwoUsers() throws Exception {
-        createUser(user);
-        createUser(user2);
+        createUserResAct(user);
+        createUserResAct(user2);
 
         List<RespUserDto> users = getUsers();
         checkUser(users.getFirst(), user);

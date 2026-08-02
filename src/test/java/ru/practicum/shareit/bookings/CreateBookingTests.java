@@ -1,5 +1,6 @@
 package ru.practicum.shareit.bookings;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.dto.ReqBookingDto;
@@ -15,16 +16,20 @@ import static ru.practicum.shareit.users.UserData.user;
 
 @DisplayName("Проверка создания бронирования вещи")
 public class CreateBookingTests extends BookingTest {
+    private RespUserDto createdUser;
+    private RespItemDto createdItem;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        createdUser = createUser(user);
+        createdItem = createItem(item, createdUser.getId());
+    }
 
     @Test
     void checkCreateItem() throws Exception {
-        //создание юзера и вещи
-        RespUserDto createdUser = createUserDto(user);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
-
         //создание брони вещи
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        RespBookingDto createdBooking = createBookingDto(reqBody, createdUser.getId());
+        RespBookingDto createdBooking = createBooking(reqBody, createdUser.getId());
 
         //проверка соданной брони
         checkBooking(createdBooking, reqBody, createdItem, createdUser, createdUser, BookingStatus.WAITING);
@@ -32,31 +37,26 @@ public class CreateBookingTests extends BookingTest {
 
     @Test
     void checkStartNullValidation() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
         ReqBookingDto startNull = booking.toBuilder()
                 .itemId(createdItem.getId())
                 .start(null)
                 .build();
 
-        checkValidationError(createBooking(startNull, createdUser.getId()), START_DATE_NULL_MESSAGE);
+        checkValidationError(createBookingResAct(startNull, createdUser.getId()), START_DATE_NULL_MESSAGE);
     }
 
     @Test
     void checkEndNullValidation() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
         ReqBookingDto endNull = booking.toBuilder()
                 .itemId(createdItem.getId())
                 .end(null)
                 .build();
 
-        checkValidationError(createBooking(endNull, createdUser.getId()), END_DATE_NULL_MESSAGE);
+        checkValidationError(createBookingResAct(endNull, createdUser.getId()), END_DATE_NULL_MESSAGE);
     }
 
     @Test
     void checkItemIdNullValidation() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        checkValidationError(createBooking(booking, createdUser.getId()), ITEM_ID_NULL_MESSAGE);
+        checkValidationError(createBookingResAct(booking, createdUser.getId()), ITEM_ID_NULL_MESSAGE);
     }
 }

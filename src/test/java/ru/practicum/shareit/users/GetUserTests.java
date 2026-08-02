@@ -15,7 +15,7 @@ public class GetUserTests extends UserTest {
 
     @Test
     void checkGetUser() throws Exception {
-        Long userId = getIdFromObject(createUser(user));
+        Long userId = getIdFromObject(createUserResAct(user));
         RespUserDto actUser = getUser(userId);
         checkUser(actUser, user);
     }

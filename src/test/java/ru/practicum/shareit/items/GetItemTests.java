@@ -16,8 +16,8 @@ public class GetItemTests extends ItemsTest {
 
     @Test
     void checkGetItem() throws Exception {
-        RespUserDto createdUser = createUserDto(user);
-        RespItemDto createdItem = createItemDto(item, createdUser.getId());
+        RespUserDto createdUser = createUser(user);
+        RespItemDto createdItem = createItem(item, createdUser.getId());
 
         RespItemDto gettingItem = getItem(createdItem.getId(), createdUser.getId());
         checkItem(gettingItem, item, createdUser, List.of());
@@ -25,7 +25,7 @@ public class GetItemTests extends ItemsTest {
 
     @Test
     void checkGetDoesNotExistItem() throws Exception {
-        Long userId = getIdFromObject(createUser(user));
+        Long userId = getIdFromObject(createUserResAct(user));
         Long itemNotExistId = 10L;
         checkNotFoundError(getItemResAct(itemNotExistId, userId), String.format(ITEM_NOT_FOUND_MESSAGE, itemNotExistId));
     }

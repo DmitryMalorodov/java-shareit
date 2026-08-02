@@ -23,8 +23,8 @@ public class BookingTest extends ShareItTests {
     static final String BOOKINGS_OWNER = "/bookings/owner";
     static final String BOOKING_ID = "/bookings/{bookingId}";
 
-    RespBookingDto getBookingDtoById(Long bookingId, Long userId) throws Exception {
-        String jsonResponse = getBookingById(bookingId, userId)
+    RespBookingDto getBookingById(Long bookingId, Long userId) throws Exception {
+        String jsonResponse = getBookingByIdResAct(bookingId, userId)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -33,7 +33,7 @@ public class BookingTest extends ShareItTests {
         return objectMapper.readValue(jsonResponse, RespBookingDto.class);
     }
 
-    ResultActions getBookingById(Long bookingId, Long userId) throws Exception {
+    ResultActions getBookingByIdResAct(Long bookingId, Long userId) throws Exception {
         return mockMvc.perform(get(BOOKING_ID, bookingId)
                 .header("X-Sharer-User-Id", userId));
     }
@@ -51,9 +51,7 @@ public class BookingTest extends ShareItTests {
     }
 
     Collection<RespBookingDto> getUserItemsBookings(Long userId, String state) throws Exception {
-        String jsonResponse = mockMvc.perform(get(BOOKINGS_OWNER)
-                        .queryParam("state", state)
-                        .header("X-Sharer-User-Id", userId))
+        String jsonResponse = getUserItemsBookingsResAct(userId, state)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -62,16 +60,26 @@ public class BookingTest extends ShareItTests {
         return objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     }
 
+    ResultActions getUserItemsBookingsResAct(Long userId, String state) throws Exception {
+        return mockMvc.perform(get(BOOKINGS_OWNER)
+                .queryParam("state", state)
+                .header("X-Sharer-User-Id", userId));
+    }
+
     RespBookingDto approveBooking(Long bookingId, String isApproved, Long userId) throws Exception {
-        String jsonResponse = mockMvc.perform(patch(BOOKING_ID, bookingId)
-                        .queryParam("approved", isApproved)
-                        .header("X-Sharer-User-Id", userId))
+        String jsonResponse = approveBookingResAct(bookingId, isApproved, userId)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
         return objectMapper.readValue(jsonResponse, RespBookingDto.class);
+    }
+
+    ResultActions approveBookingResAct(Long bookingId, String isApproved, Long userId) throws Exception {
+        return mockMvc.perform(patch(BOOKING_ID, bookingId)
+                .queryParam("approved", isApproved)
+                .header("X-Sharer-User-Id", userId));
     }
 
     void checkBooking(RespBookingDto actBooking, ReqBookingDto expBooking, RespItemDto expItem,
