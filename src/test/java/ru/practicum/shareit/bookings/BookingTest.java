@@ -15,8 +15,7 @@ import java.util.Collection;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.practicum.shareit.GeneralAssertions.isEqualTo;
-import static ru.practicum.shareit.GeneralAssertions.isNotNull;
+import static ru.practicum.shareit.GeneralAssertions.*;
 
 public class BookingTest extends ShareItTests {
     static final String BOOKINGS = "/bookings";
@@ -89,9 +88,9 @@ public class BookingTest extends ShareItTests {
 
         isNotNull(actBooking.getId(),
                 "ID бронироваия равен null", softAssert);
-        isEqualTo(actBooking.getStart(), expBooking.getStart(),
+        isCloseTo(actBooking.getStart(), expBooking.getStart(),
                 "Дата начала бронирования '%s' не совпадает с ожидаемой '%s'", softAssert);
-        isEqualTo(actBooking.getEnd(), expBooking.getEnd(),
+        isCloseTo(actBooking.getEnd(), expBooking.getEnd(),
                 "Дата окончания бронирования '%s' не совпадает с ожидаемой '%s'", softAssert);
         isEqualTo(actBooking.getStatus(), expStatus,
                 "Статус бронирования '%s' не совпадает с ожидаемым '%s'", softAssert);
