@@ -21,6 +21,8 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static ru.practicum.shareit.booking.model.BookingStatus.*;
 import static ru.practicum.shareit.constant.message.BookingValidMessages.*;
@@ -83,39 +85,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Collection<RespBookingDto> getUserBookings(Long userId, BookingState state) {
-        switch (state) {
-            case ALL -> {
-                return BookingMapper.toRespBookingDto(bookingRepository.findByBookerIdOrderByStartDesc(userId));
-            }
-
-            case CURRENT -> {
-                return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                                userId, LocalDateTime.now(), LocalDateTime.now()));
-            }
-
-            case PAST -> {
-                return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now()));
-            }
-
-            case FUTURE -> {
-                return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now()));
-            }
-
-            case WAITING -> {
-                return BookingMapper.toRespBookingDto(bookingRepository
-                        .findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING));
-            }
-
-            case REJECTED -> {
-                return BookingMapper.toRespBookingDto(bookingRepository
-                        .findByBookerIdAndStatusOrderByStartDesc(userId, REJECTED));
-            }
-
-            default -> throw new ValidationException("Передано несуществуюшее значение состояния заказа");
-        }
+        return getBookingsByState(userId, state,
+                bookingRepository::findByBookerIdOrderByStartDesc,
+                (id, time) -> bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(id, time, time),
+                bookingRepository::findByBookerIdAndEndIsBeforeOrderByStartDesc,
+                bookingRepository::findByBookerIdAndStartIsAfterOrderByStartDesc,
+                bookingRepository::findByBookerIdAndStatusOrderByStartDesc
+        );
     }
 
     @Override
@@ -124,39 +100,33 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("У пользователя нет ни одной вещи!");
         }
 
-        switch (state) {
-            case ALL -> {
-                return BookingMapper.toRespBookingDto(bookingRepository
-                        .findByItemOwnerIdOrderByStartDesc(userId));
-            }
+        return getBookingsByState(userId, state,
+                bookingRepository::findByItemOwnerIdOrderByStartDesc,
+                (id, time) -> bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(id, time, time),
+                bookingRepository::findByItemOwnerIdAndEndIsBeforeOrderByStartDesc,
+                bookingRepository::findByItemOwnerIdAndStartIsAfterOrderByStartDesc,
+                bookingRepository::findByItemOwnerIdAndStatusOrderByStartDesc
+        );
+    }
 
-            case CURRENT -> {
-                return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                                userId, LocalDateTime.now(), LocalDateTime.now()));
-            }
+    private Collection<RespBookingDto> getBookingsByState(
+            Long userId,
+            BookingState state,
+            Function<Long, Collection<Booking>> findAll,
+            BookingFinder findCurrent,
+            BookingFinder findPast,
+            BookingFinder findFuture,
+            BiFunction<Long, BookingStatus, Collection<Booking>> findByStatus
+    ) {
+        Collection<Booking> bookings = switch (state) {
+            case ALL -> findAll.apply(userId);
+            case CURRENT -> findCurrent.find(userId, LocalDateTime.now());
+            case PAST -> findPast.find(userId, LocalDateTime.now());
+            case FUTURE -> findFuture.find(userId, LocalDateTime.now());
+            case WAITING -> findByStatus.apply(userId, BookingStatus.WAITING);
+            case REJECTED -> findByStatus.apply(userId, BookingStatus.REJECTED);
+        };
 
-            case PAST -> {
-                return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now()));
-            }
-
-            case FUTURE -> {
-                return BookingMapper.toRespBookingDto(
-                        bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now()));
-            }
-
-            case WAITING -> {
-                return BookingMapper.toRespBookingDto(bookingRepository
-                        .findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING));
-            }
-
-            case REJECTED -> {
-                return BookingMapper.toRespBookingDto(bookingRepository
-                        .findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED));
-            }
-
-            default -> throw new ValidationException("Передано несуществуюшее значение состояния заказа");
-        }
+        return BookingMapper.toRespBookingDto(bookings);
     }
 }
