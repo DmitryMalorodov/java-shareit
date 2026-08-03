@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.booking.dto.RespBookingDto;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.marker.OnCreate;
 
 import java.util.Collection;
 
@@ -40,7 +39,7 @@ public class BookingController {
             @NotNull
             @Min(value = 1, message = "ID пользователя должен быть больше 0")
             final Long userId,
-            @Validated(OnCreate.class) @RequestBody final ReqBookingDto booking
+            @Validated @RequestBody final ReqBookingDto booking
     ) {
         return bookingService.create(booking, userId);
     }

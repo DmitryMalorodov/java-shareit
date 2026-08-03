@@ -2,13 +2,16 @@ package ru.practicum.shareit.items;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.item.dto.RespCommentDto;
 import ru.practicum.shareit.item.dto.RespItemDto;
 import ru.practicum.shareit.user.dto.RespUserDto;
 
-import static ru.practicum.shareit.bookings.BookingData.booking;
-import static ru.practicum.shareit.bookings.BookingData.booking3;
+import java.time.LocalDateTime;
+
+import static ru.practicum.shareit.bookings.BookingData.*;
 import static ru.practicum.shareit.constant.message.ItemValidMessages.COMMENT_ACCESS_MESSAGE;
 import static ru.practicum.shareit.items.ItemData.comment;
 import static ru.practicum.shareit.items.ItemData.item;
@@ -27,9 +30,15 @@ public class CreateCommentTests extends ItemsTest {
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
         createBooking(reqBody, createdUser.getId());
 
-        //создание и проверка комментария
-        RespCommentDto createdComment = createComment(comment, createdUser.getId(), createdItem.getId());
-        checkComment(createdComment, comment, createdUser);
+        LocalDateTime futureTime = LocalDateTime.now().plusWeeks(1);
+        try (MockedStatic<LocalDateTime> mockedTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+            //устанавливаем будущее время для системы чтобы бронирование уже завершилось
+            mockedTime.when(LocalDateTime::now).thenReturn(futureTime);
+
+            //создание и проверка комментария
+            RespCommentDto createdComment = createComment(comment, createdUser.getId(), createdItem.getId());
+            checkComment(createdComment, comment, createdUser);
+        }
     }
 
     @Test
@@ -39,7 +48,7 @@ public class CreateCommentTests extends ItemsTest {
         RespItemDto createdItem = createItem(item, createdUser.getId());
 
         //создание брони вещи
-        ReqBookingDto reqBody = booking3.toBuilder().itemId(createdItem.getId()).build();
+        ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
         createBooking(reqBody, createdUser.getId());
 
         //создание и проверка комментария

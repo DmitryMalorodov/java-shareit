@@ -9,5 +9,7 @@ public class BookingValidMessages {
             " либо владелец вещи данного бронирования";
     public static final String BOOKING_APPROVED_ACCESS_ERROR = "Статус бронирования может менять только владелец " +
             "вещи данного бронирования";
+    public static final String BOOKING_START_DATE_VALID_MESSAGE = "Дата начала бронирования не может быть в прошлом";
+    public static final String BOOKING_END_DATE_VALID_MESSAGE = "Дата окончания бронирования может быть только в будущем";
     public static final String USER_DO_NOT_HAVE_ANY_ITEM = "У пользователя нет ни одной вещи!";
 }

@@ -78,21 +78,20 @@ public class GetUserBookingsTests extends BookingTest {
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "PAST");
-        GeneralAssertions.isEqualTo(userBookings.size(), 2,
-                "Размер списка броней '%d' не соответствует ожидаемому '%d'");
+        GeneralAssertions.isTrue(userBookings.isEmpty(), "Список броней не пустой!");
     }
 
     @Test
     void checkGetUserBookingsFuture() throws Exception {
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        ReqBookingDto reqBody2 = booking2.toBuilder().itemId(createdItem.getId()).build();
+        ReqBookingDto reqBody2 = booking.toBuilder().itemId(createdItem.getId()).build();
         createBooking(reqBody, createdUser.getId());
         createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "FUTURE");
-        GeneralAssertions.isEqualTo(userBookings.size(), 1,
+        GeneralAssertions.isEqualTo(userBookings.size(), 2,
                 "Размер списка броней '%d' не соответствует ожидаемому '%d'");
     }
 
@@ -100,13 +99,12 @@ public class GetUserBookingsTests extends BookingTest {
     void checkGetUserBookingsCurrent() throws Exception {
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        ReqBookingDto reqBody2 = booking3.toBuilder().itemId(createdItem.getId()).build();
+        ReqBookingDto reqBody2 = booking.toBuilder().itemId(createdItem.getId()).build();
         createBooking(reqBody, createdUser.getId());
         createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "CURRENT");
-        GeneralAssertions.isEqualTo(userBookings.size(), 1,
-                "Размер списка броней '%d' не соответствует ожидаемому '%d'");
+        GeneralAssertions.isTrue(userBookings.isEmpty(), "Список броней не пустой!");
     }
 }

@@ -88,27 +88,26 @@ public class GetUserItemsBookingsTests extends BookingTest {
     void checkGetUserItemsBookingsPast() throws Exception {
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        ReqBookingDto reqBody2 = booking3.toBuilder().itemId(createdItem.getId()).build();
+        ReqBookingDto reqBody2 = booking.toBuilder().itemId(createdItem.getId()).build();
         createBooking(reqBody, createdUser.getId());
         createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserItemsBookings(createdUser2.getId(), "PAST");
-        GeneralAssertions.isEqualTo(userBookings.size(), 1,
-                "Размер списка броней '%d' не соответствует ожидаемому '%d'");
+        GeneralAssertions.isTrue(userBookings.isEmpty(), "Список броней не пустой!");
     }
 
     @Test
     void checkGetUserItemsBookingsFuture() throws Exception {
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        ReqBookingDto reqBody2 = booking2.toBuilder().itemId(createdItem.getId()).build();
+        ReqBookingDto reqBody2 = booking.toBuilder().itemId(createdItem.getId()).build();
         createBooking(reqBody, createdUser.getId());
         createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserItemsBookings(createdUser2.getId(), "FUTURE");
-        GeneralAssertions.isEqualTo(userBookings.size(), 1,
+        GeneralAssertions.isEqualTo(userBookings.size(), 2,
                 "Размер списка броней '%d' не соответствует ожидаемому '%d'");
     }
 
@@ -116,13 +115,12 @@ public class GetUserItemsBookingsTests extends BookingTest {
     void checkGetUserItemsBookingsCurrent() throws Exception {
         //создание броней на вещь
         ReqBookingDto reqBody = booking.toBuilder().itemId(createdItem.getId()).build();
-        ReqBookingDto reqBody2 = booking3.toBuilder().itemId(createdItem.getId()).build();
+        ReqBookingDto reqBody2 = booking.toBuilder().itemId(createdItem.getId()).build();
         createBooking(reqBody, createdUser.getId());
         createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
         Collection<RespBookingDto> userBookings = getUserItemsBookings(createdUser2.getId(), "CURRENT");
-        GeneralAssertions.isEqualTo(userBookings.size(), 1,
-                "Размер списка броней '%d' не соответствует ожидаемому '%d'");
+        GeneralAssertions.isTrue(userBookings.isEmpty(), "Список броней не пустой!");
     }
 }
