@@ -38,7 +38,7 @@ public class GetUserBookingsTests extends BookingTest {
         createBooking(reqBody, createdUser.getId());
 
         //получение и проверка броней
-        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "all");
+        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "ALL");
         for (RespBookingDto booking : userBookings) {
             checkBooking(booking, reqBody, createdItem, createdUser2, createdUser, BookingStatus.WAITING);
         }
@@ -52,7 +52,7 @@ public class GetUserBookingsTests extends BookingTest {
         createBooking(reqBody, createdUser.getId());
 
         //получение и проверка броней
-        Collection<RespBookingDto> userBookings = getUserBookings(createdUser2.getId(), "all");
+        Collection<RespBookingDto> userBookings = getUserBookings(createdUser2.getId(), "ALL");
         GeneralAssertions.isTrue(userBookings.isEmpty(), "Список броней не пустой!");
     }
 
@@ -64,7 +64,7 @@ public class GetUserBookingsTests extends BookingTest {
         createBooking(reqBody, createdUser.getId());
 
         //получение и проверка броней
-        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "waiting");
+        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "WAITING");
         GeneralAssertions.isEqualTo(userBookings.size(), 2,
                 "Размер списка броней '%d' не соответствует ожидаемому '%d'");
     }
@@ -77,7 +77,7 @@ public class GetUserBookingsTests extends BookingTest {
         createBooking(reqBody, createdUser.getId());
 
         //получение и проверка броней
-        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "past");
+        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "PAST");
         GeneralAssertions.isEqualTo(userBookings.size(), 2,
                 "Размер списка броней '%d' не соответствует ожидаемому '%d'");
     }
@@ -91,7 +91,7 @@ public class GetUserBookingsTests extends BookingTest {
         createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
-        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "future");
+        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "FUTURE");
         GeneralAssertions.isEqualTo(userBookings.size(), 1,
                 "Размер списка броней '%d' не соответствует ожидаемому '%d'");
     }
@@ -105,7 +105,7 @@ public class GetUserBookingsTests extends BookingTest {
         createBooking(reqBody2, createdUser.getId());
 
         //получение и проверка броней
-        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "current");
+        Collection<RespBookingDto> userBookings = getUserBookings(createdUser.getId(), "CURRENT");
         GeneralAssertions.isEqualTo(userBookings.size(), 1,
                 "Размер списка броней '%d' не соответствует ожидаемому '%d'");
     }

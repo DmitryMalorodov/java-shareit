@@ -6,6 +6,7 @@ import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.booking.dto.RespBookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
@@ -77,31 +78,36 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Collection<RespBookingDto> getUserBookings(Long userId, String state) {
+    public Collection<RespBookingDto> getUserBookings(Long userId, BookingState state) {
         switch (state) {
-            case "ALL" -> {
+            case ALL -> {
                 return BookingMapper.toRespBookingDto(bookingRepository.findByBookerIdOrderByStartDesc(userId));
             }
 
-            case "CURRENT" -> {
+            case CURRENT -> {
                 return BookingMapper.toRespBookingDto(
                         bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                                 userId, LocalDateTime.now(), LocalDateTime.now()));
             }
 
-            case "PAST" -> {
+            case PAST -> {
                 return BookingMapper.toRespBookingDto(
                         bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now()));
             }
 
-            case "FUTURE" -> {
+            case FUTURE -> {
                 return BookingMapper.toRespBookingDto(
                         bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now()));
             }
 
-            case "WAITING", "REJECTED" -> {
+            case WAITING -> {
                 return BookingMapper.toRespBookingDto(bookingRepository
-                        .findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.valueOf(state)));
+                        .findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING));
+            }
+
+            case REJECTED -> {
+                return BookingMapper.toRespBookingDto(bookingRepository
+                        .findByBookerIdAndStatusOrderByStartDesc(userId, REJECTED));
             }
 
             default -> throw new ValidationException("Передано несуществуюшее значение состояния заказа");
@@ -109,36 +115,41 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Collection<RespBookingDto> getUserItemsBookings(Long userId, String state) {
+    public Collection<RespBookingDto> getUserItemsBookings(Long userId, BookingState state) {
         if (itemService.getUserItems(userId).isEmpty()) {
             throw new NotFoundException("У пользователя нет ни одной вещи!");
         }
 
         switch (state) {
-            case "ALL" -> {
+            case ALL -> {
                 return BookingMapper.toRespBookingDto(bookingRepository
                         .findByItemOwnerIdOrderByStartDesc(userId));
             }
 
-            case "CURRENT" -> {
+            case CURRENT -> {
                 return BookingMapper.toRespBookingDto(
                         bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                                 userId, LocalDateTime.now(), LocalDateTime.now()));
             }
 
-            case "PAST" -> {
+            case PAST -> {
                 return BookingMapper.toRespBookingDto(
                         bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now()));
             }
 
-            case "FUTURE" -> {
+            case FUTURE -> {
                 return BookingMapper.toRespBookingDto(
                         bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now()));
             }
 
-            case "WAITING", "REJECTED" -> {
+            case WAITING -> {
                 return BookingMapper.toRespBookingDto(bookingRepository
-                        .findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.valueOf(state)));
+                        .findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING));
+            }
+
+            case REJECTED -> {
+                return BookingMapper.toRespBookingDto(bookingRepository
+                        .findByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED));
             }
 
             default -> throw new ValidationException("Передано несуществуюшее значение состояния заказа");
