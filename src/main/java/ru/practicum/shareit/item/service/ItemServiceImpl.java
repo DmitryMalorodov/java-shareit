@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -22,6 +23,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.constant.message.ItemValidMessages.*;
 
@@ -39,9 +42,9 @@ public class ItemServiceImpl implements ItemService {
                 .map(ItemMapper::toGetUserItemsDto)
                 .orElseThrow(() -> new NotFoundException(String.format(ITEM_NOT_FOUND_MESSAGE, id)));
 
-        setCommentsToItem(item);
+        setCommentsToItems(List.of(item.getId()), List.of(item));
         if (item.getOwner().getId().equals(userId)) {
-            setNextAndLastBookingToItem(item);
+            setBookingDatesToItems(List.of(item.getId()), List.of(item));
         }
 
         return item;
@@ -49,15 +52,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<GetUserItemsDto> getUserItems(Long userId) {
-        return itemRepository.findByOwnerId(userId)
+        //получение вещей пользователя
+        List<GetUserItemsDto> items = itemRepository.findByOwnerId(userId)
                 .stream()
                 .map(ItemMapper::toGetUserItemsDto)
-                .map(item -> {
-                    setCommentsToItem(item);
-                    setNextAndLastBookingToItem(item);
-                    return item;
-                })
                 .toList();
+
+        if (items.isEmpty()) return List.of();
+
+        //сбор всех id вещей в список
+        List<Long> itemIds = items.stream().map(GetUserItemsDto::getId).toList();
+
+        //установка комментов и дат прошедших/ближайших бронирований
+        setCommentsToItems(itemIds, items);
+        setBookingDatesToItems(itemIds, items);
+
+        return items;
     }
 
     @Override
@@ -111,47 +121,61 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toRespCommentDto(createdComment);
     }
 
-    private void setCommentsToItem(GetUserItemsDto item) {
-        //получаем и устанавливаем список комментов для найденной вещи
-        Collection<Comment> itemComments = commentRepository.findByItemId(item.getId());
-        item.setComments(CommentMapper.toRespCommentDto(itemComments));
+    private void setCommentsToItems(List<Long> itemIds, List<GetUserItemsDto> items) {
+        //забираем из БД все комменты по itemIds и группируем по itemId
+        Map<Long, List<Comment>> commentsMap = commentRepository.findByItemIdIn(itemIds)
+                .stream()
+                .collect(Collectors.groupingBy(comment -> comment.getItem().getId()));
+
+        //установка комментов в дто
+        for (GetUserItemsDto item : items) {
+            List<Comment> itemComments = commentsMap.getOrDefault(item.getId(), List.of());
+            item.setComments(CommentMapper.toRespCommentDto(itemComments));
+        }
     }
 
-    private void setNextAndLastBookingToItem(GetUserItemsDto item) {
-        //получение списка всех брониований для item
-        Collection<Booking> itemBookings = bookingRepository.findByItemId(item.getId());
-        LocalDateTime now = LocalDateTime.now();
+    private void setBookingDatesToItems(List<Long> itemIds, List<GetUserItemsDto> items) {
+        //забираем из БД все брони по itemIds и группируем по itemId
+        Map<Long, List<Booking>> bookingsMap = bookingRepository.findByItemIdInAndStatus(itemIds, BookingStatus.APPROVED)
+                .stream()
+                .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
+
+        //установка информации по бронированию в дто
+        for (GetUserItemsDto item : items) {
+            List<Booking> itemBookings = bookingsMap.getOrDefault(item.getId(), List.of());
+            setNextAndLastBookingToItem(item, itemBookings);
+        }
+    }
+
+    private void setNextAndLastBookingToItem(GetUserItemsDto item, List<Booking> itemBookings) {
+        if (itemBookings.isEmpty()) return;
 
         //получение ближайшего бронирования для item
         Booking nextBooking = itemBookings.stream()
-                .filter(booking -> booking.getStart().isAfter(now))
+                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
                 .min(Comparator.comparing(Booking::getStart))
                 .orElse(null);
 
         //получение самого последнего бронирования для item
         Booking lastBooking = itemBookings.stream()
-                .filter(booking -> !booking.getStart().isAfter(now))
+                .filter(booking -> !booking.getStart().isAfter(LocalDateTime.now()))
                 .max(Comparator.comparing(Booking::getStart))
                 .orElse(null);
 
         //устанавливаем даты ближайшего бронирования для передачи в dto
         if (nextBooking != null) {
-            item.setNextBooking(
-                    NextBookingDateDto.builder()
-                            .start(nextBooking.getStart())
-                            .end(nextBooking.getEnd())
-                            .build()
-            );
+            item.setNextBooking(NextBookingDateDto.builder()
+                    .start(nextBooking.getStart())
+                    .end(nextBooking.getEnd())
+                    .build());
         }
 
         //устанавливаем даты самого последнего бронирования для передачи в dto
         if (lastBooking != null) {
-            item.setLastBooking(
-                    LastBookingDateDto.builder()
-                            .start(lastBooking.getStart())
-                            .end(lastBooking.getEnd())
-                            .build()
-            );
+            item.setLastBooking(LastBookingDateDto.builder()
+                    .start(lastBooking.getStart())
+                    .end(lastBooking.getEnd())
+                    .build());
         }
     }
 }

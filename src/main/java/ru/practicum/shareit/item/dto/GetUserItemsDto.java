@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
@@ -16,5 +17,7 @@ public class GetUserItemsDto {
     private User owner;
     private NextBookingDateDto nextBooking;
     private LastBookingDateDto lastBooking;
-    private Collection<RespCommentDto> comments;
+
+    @Builder.Default
+    private Collection<RespCommentDto> comments = new ArrayList<>();
 }
