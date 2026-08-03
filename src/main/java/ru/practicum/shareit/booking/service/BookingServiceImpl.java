@@ -22,8 +22,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import static ru.practicum.shareit.booking.model.BookingStatus.APPROVED;
-import static ru.practicum.shareit.booking.model.BookingStatus.REJECTED;
+import static ru.practicum.shareit.booking.model.BookingStatus.*;
 import static ru.practicum.shareit.constant.message.BookingValidMessages.*;
 
 @Service
@@ -67,10 +66,15 @@ public class BookingServiceImpl implements BookingService {
             throw new AccessDeniedException(BOOKING_APPROVED_ACCESS_ERROR);
         }
 
-        if (approved == true) {
-            booking.setStatus(APPROVED);
+        if (booking.getStatus().equals(WAITING)) {
+            if (approved == true) {
+                booking.setStatus(APPROVED);
+            } else {
+                booking.setStatus(REJECTED);
+            }
         } else {
-            booking.setStatus(REJECTED);
+            throw new AccessDeniedException("Подтверждать или отклонять бронирование можно только в статусе WAITING " +
+                    "текущий статус бронирования - " + booking.getStatus());
         }
 
         Booking createdBooking = bookingRepository.save(booking);
