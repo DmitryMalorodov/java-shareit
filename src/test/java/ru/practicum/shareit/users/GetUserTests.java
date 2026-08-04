@@ -2,6 +2,7 @@ package ru.practicum.shareit.users;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.practicum.shareit.user.dto.RespUserDto;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -14,13 +15,9 @@ public class GetUserTests extends UserTest {
 
     @Test
     void checkGetUser() throws Exception {
-        Long userId = getIdFromObject(createUser(user));
-
-        mockMvc.perform(get(USERS_ID, userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(userId))
-                .andExpect(jsonPath("$.email").value(user.getEmail()))
-                .andExpect(jsonPath("$.name").value(user.getName()));
+        Long userId = getIdFromObject(createUserResAct(user));
+        RespUserDto actUser = getUser(userId);
+        checkUser(actUser, user);
     }
 
     @Test

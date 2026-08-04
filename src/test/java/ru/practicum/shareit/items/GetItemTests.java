@@ -2,10 +2,11 @@ package ru.practicum.shareit.items;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.practicum.shareit.item.dto.RespItemDto;
+import ru.practicum.shareit.user.dto.RespUserDto;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.List;
+
 import static ru.practicum.shareit.constant.message.ItemValidMessages.ITEM_NOT_FOUND_MESSAGE;
 import static ru.practicum.shareit.items.ItemData.item;
 import static ru.practicum.shareit.users.UserData.user;
@@ -15,25 +16,17 @@ public class GetItemTests extends ItemsTest {
 
     @Test
     void checkGetItem() throws Exception {
-        Long userId = getIdFromObject(createUser(user));
-        createItem(item, userId);
+        RespUserDto createdUser = createUser(user);
+        RespItemDto createdItem = createItem(item, createdUser.getId());
 
-        mockMvc.perform(get(ITEMS_ID, userId).header("X-Sharer-User-Id", userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value(item.getName()))
-                .andExpect(jsonPath("$.description").value(item.getDescription()))
-                .andExpect(jsonPath("$.available").value(item.getAvailable()))
-                .andExpect(jsonPath("$.ownerId").value(userId));
+        RespItemDto gettingItem = getItem(createdItem.getId(), createdUser.getId());
+        checkItem(gettingItem, item, createdUser, List.of());
     }
 
     @Test
     void checkGetDoesNotExistItem() throws Exception {
-        Long userId = getIdFromObject(createUser(user));
+        Long userId = getIdFromObject(createUserResAct(user));
         Long itemNotExistId = 10L;
-
-        mockMvc.perform(get(ITEMS_ID, itemNotExistId).header("X-Sharer-User-Id", userId))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value(String.format(ITEM_NOT_FOUND_MESSAGE, itemNotExistId)));
+        checkNotFoundError(getItemResAct(itemNotExistId, userId), String.format(ITEM_NOT_FOUND_MESSAGE, itemNotExistId));
     }
 }

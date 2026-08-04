@@ -2,7 +2,10 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.model.User;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * TODO Sprint add-controllers.
@@ -14,6 +17,8 @@ public class RespItemDto {
     private String name;
     private String description;
     private Boolean available;
-    private Long ownerId;
-    private ItemRequest request;
+    private User owner;
+
+    @Builder.Default
+    private Collection<RespCommentDto> comments = new ArrayList<>();
 }

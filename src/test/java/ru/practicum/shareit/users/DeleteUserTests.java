@@ -15,7 +15,7 @@ public class DeleteUserTests extends UserTest {
 
     @Test
     void checkDeleteUser() throws Exception {
-        Long userId = getIdFromObject(createUser(user));
+        Long userId = getIdFromObject(createUserResAct(user));
 
         mockMvc.perform(delete(USERS_ID, userId))
                 .andExpect(status().isOk());

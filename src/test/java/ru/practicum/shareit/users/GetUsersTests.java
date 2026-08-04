@@ -2,6 +2,10 @@ package ru.practicum.shareit.users;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.practicum.shareit.user.dto.RespUserDto;
+
+import java.util.Collection;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -14,30 +18,22 @@ public class GetUsersTests extends UserTest {
 
     @Test
     void checkGettingOneUser() throws Exception {
-        createUser(user);
+        createUserResAct(user);
 
-        mockMvc.perform(get(USERS))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].id").exists())
-                .andExpect(jsonPath("$[0].email").value(user.getEmail()))
-                .andExpect(jsonPath("$[0].name").value(user.getName()));
+        Collection<RespUserDto> users = getUsers();
+        for (RespUserDto u : users) {
+            checkUser(u, user);
+        }
     }
 
     @Test
     void checkGettingTwoUsers() throws Exception {
-        createUser(user);
-        createUser(user2);
+        createUserResAct(user);
+        createUserResAct(user2);
 
-        mockMvc.perform(get(USERS))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").exists())
-                .andExpect(jsonPath("$[0].email").value(user.getEmail()))
-                .andExpect(jsonPath("$[0].name").value(user.getName()))
-                .andExpect(jsonPath("$[1].id").exists())
-                .andExpect(jsonPath("$[1].email").value(user2.getEmail()))
-                .andExpect(jsonPath("$[1].name").value(user2.getName()));
+        List<RespUserDto> users = getUsers();
+        checkUser(users.getFirst(), user);
+        checkUser(users.getLast(), user2);
     }
 
     @Test
