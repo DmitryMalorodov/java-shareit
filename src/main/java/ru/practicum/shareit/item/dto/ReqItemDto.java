@@ -21,4 +21,6 @@ public class ReqItemDto {
 
     @NotNull(groups = OnCreate.class, message = AVAILABLE_NULL_MESSAGE)
     private Boolean available;
+
+    private Long requestId;
 }

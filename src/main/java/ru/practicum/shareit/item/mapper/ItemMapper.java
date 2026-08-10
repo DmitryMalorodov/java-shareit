@@ -6,6 +6,7 @@ import ru.practicum.shareit.item.dto.GetUserItemsDto;
 import ru.practicum.shareit.item.dto.ReqItemDto;
 import ru.practicum.shareit.item.dto.RespItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,12 +42,13 @@ public class ItemMapper {
                 .build();
     }
 
-    public static Item toItem(ReqItemDto item, User user) {
+    public static Item toItem(ReqItemDto item, User user, ItemRequest itemRequest) {
         return Item.builder()
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .owner(user)
+                .itemRequest(itemRequest)
                 .build();
     }
 }
