@@ -3,7 +3,7 @@ FROM amazoncorretto:21-alpine as builder
 # устанавливаем application в качестве рабочей директории
 WORKDIR application
 # копируем артефакт в папку application в контейнере
-COPY target/*.jar app.jar
+COPY server/target/*.jar app.jar
 # используем специальный режим запуска Spring Boot приложения,
 # который активирует распаковку итогового jar-файла на составляющие
 RUN java -Djarmode=layertools -jar app.jar extract
