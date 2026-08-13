@@ -8,4 +8,5 @@ public class ItemValidMessages extends ValidMessages {
     public static final String ITEM_UPDATE_ACCESS_MESSAGE = "Вещь может редактировать только ее собственник";
     public static final String COMMENT_ACCESS_MESSAGE = "Комментарий может оставлять только пользователь," +
             " который брал вещь в аренду и только после окончания аренды!";
+    public static final String COMMENT_BLANK_MESSAGE = "Текст комментария не может быть пустым";
 }

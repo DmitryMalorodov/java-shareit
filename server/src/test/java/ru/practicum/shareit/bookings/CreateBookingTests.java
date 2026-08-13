@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.dto.RespItemDto;
 import ru.practicum.shareit.user.dto.RespUserDto;
 
 import static ru.practicum.shareit.bookings.BookingData.booking;
-import static ru.practicum.shareit.constant.message.BookingValidMessages.*;
 import static ru.practicum.shareit.items.ItemData.item;
 import static ru.practicum.shareit.users.UserData.user;
 
@@ -33,30 +32,5 @@ public class CreateBookingTests extends BookingTest {
 
         //проверка соданной брони
         checkBooking(createdBooking, reqBody, createdItem, createdUser, createdUser, BookingStatus.WAITING);
-    }
-
-    @Test
-    void checkStartNullValidation() throws Exception {
-        ReqBookingDto startNull = booking.toBuilder()
-                .itemId(createdItem.getId())
-                .start(null)
-                .build();
-
-        checkValidationError(createBookingResAct(startNull, createdUser.getId()), START_DATE_NULL_MESSAGE);
-    }
-
-    @Test
-    void checkEndNullValidation() throws Exception {
-        ReqBookingDto endNull = booking.toBuilder()
-                .itemId(createdItem.getId())
-                .end(null)
-                .build();
-
-        checkValidationError(createBookingResAct(endNull, createdUser.getId()), END_DATE_NULL_MESSAGE);
-    }
-
-    @Test
-    void checkItemIdNullValidation() throws Exception {
-        checkValidationError(createBookingResAct(booking, createdUser.getId()), ITEM_ID_NULL_MESSAGE);
     }
 }

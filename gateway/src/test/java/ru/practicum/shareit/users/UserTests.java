@@ -4,8 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.user.dto.ReqUserDto;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.constant.ValidMessages.NAME_BLANK_MESSAGE;
@@ -41,22 +39,6 @@ public class UserTests extends UserTest {
     }
 
     @Test
-    void checkCreateUserWithExistedEmailValidation() throws Exception {
-        createUserResAct(user);
-        createUserResAct(user)
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    void checkGetDoesNotExistUser() throws Exception {
-        Long userNotExistId = 10L;
-
-        mockMvc.perform(get(USERS_ID, userNotExistId))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value(String.format(USER_NOT_FOUND_MESSAGE, userNotExistId)));
-    }
-
-    @Test
     void checkUpdateEmailNullValidation() throws Exception {
         changeUserResAct(user, USER_ID)
                 .andExpect(status().isOk())
@@ -81,13 +63,5 @@ public class UserTests extends UserTest {
         changeUserResAct(user, USER_ID)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(user.getName()));
-    }
-
-    @Test
-    void checkDeleteUserWithDoesNotExistId() throws Exception {
-        Long notExistFilmId = 10L;
-        mockMvc.perform(delete(USERS_ID, notExistFilmId))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value(String.format(USER_NOT_FOUND_MESSAGE, notExistFilmId)));
     }
 }

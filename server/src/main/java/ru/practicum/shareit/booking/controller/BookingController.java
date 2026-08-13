@@ -1,9 +1,6 @@
 package ru.practicum.shareit.booking.controller;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.booking.dto.RespBookingDto;
@@ -17,17 +14,13 @@ import java.util.Collection;
  */
 @RestController
 @RequiredArgsConstructor
-@Validated
 @RequestMapping(path = "/bookings")
 public class BookingController {
     private final BookingService bookingService;
 
     @GetMapping("/{bookingId}")
     public RespBookingDto getBookingById(
-            @RequestHeader("X-Sharer-User-Id")
-            @NotNull
-            @Min(value = 1, message = "ID пользователя должен быть больше 0")
-            final Long userId,
+            @RequestHeader("X-Sharer-User-Id") final Long userId,
             @PathVariable final Long bookingId
     ) {
         return bookingService.getBookingById(bookingId, userId);
@@ -35,21 +28,15 @@ public class BookingController {
 
     @PostMapping
     public RespBookingDto create(
-            @RequestHeader("X-Sharer-User-Id")
-            @NotNull
-            @Min(value = 1, message = "ID пользователя должен быть больше 0")
-            final Long userId,
-            @Validated @RequestBody final ReqBookingDto booking
+            @RequestHeader("X-Sharer-User-Id") final Long userId,
+            @RequestBody final ReqBookingDto booking
     ) {
         return bookingService.create(booking, userId);
     }
 
     @PatchMapping("/{bookingId}")
     public RespBookingDto approveBooking(
-            @RequestHeader("X-Sharer-User-Id")
-            @NotNull
-            @Min(value = 1, message = "ID пользователя должен быть больше 0")
-            final Long userId,
+            @RequestHeader("X-Sharer-User-Id") final Long userId,
             @PathVariable final Long bookingId,
             @RequestParam final Boolean approved
     ) {
@@ -58,10 +45,7 @@ public class BookingController {
 
     @GetMapping
     public Collection<RespBookingDto> getUserBookings(
-            @RequestHeader("X-Sharer-User-Id")
-            @NotNull
-            @Min(value = 1, message = "ID пользователя должен быть больше 0")
-            final Long userId,
+            @RequestHeader("X-Sharer-User-Id") final Long userId,
             @RequestParam(defaultValue = "ALL") final BookingState state
     ) {
         return bookingService.getUserBookings(userId, state);
@@ -69,10 +53,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public Collection<RespBookingDto> getUserItemsBookings(
-            @RequestHeader("X-Sharer-User-Id")
-            @NotNull
-            @Min(value = 1, message = "ID пользователя должен быть больше 0")
-            final Long userId,
+            @RequestHeader("X-Sharer-User-Id") final Long userId,
             @RequestParam(defaultValue = "ALL") final BookingState state
     ) {
         return bookingService.getUserItemsBookings(userId, state);

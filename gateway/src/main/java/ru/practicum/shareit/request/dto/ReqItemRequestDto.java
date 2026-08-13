@@ -1,17 +1,18 @@
 package ru.practicum.shareit.request.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * TODO Sprint add-item-requests.
- */
+import static ru.practicum.shareit.constant.ValidMessages.DESCRIPTION_BLANK_MESSAGE;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class ReqItemRequestDto {
+    @NotBlank(message = DESCRIPTION_BLANK_MESSAGE)
     private String description;
 }

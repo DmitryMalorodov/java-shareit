@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import ru.practicum.shareit.booking.dto.ReqBookingDto;
+import ru.practicum.shareit.item.dto.ReqItemDto;
 import ru.practicum.shareit.user.dto.ReqUserDto;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,5 +36,19 @@ public class ShareItTests {
         return mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)));
+    }
+
+    protected ResultActions createItemResAct(ReqItemDto item, Long userId) throws Exception {
+        return mockMvc.perform(post("/items")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", userId)
+                .content(objectMapper.writeValueAsString(item)));
+    }
+
+    protected ResultActions createBookingResAct(ReqBookingDto booking, Long userId) throws Exception {
+        return mockMvc.perform(post("/bookings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", userId)
+                .content(objectMapper.writeValueAsString(booking)));
     }
 }

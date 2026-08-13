@@ -12,7 +12,7 @@ import static ru.practicum.shareit.constant.message.BookingValidMessages.*;
 
 @Data
 @Builder(toBuilder = true)
-public class BookingItemRequestDto {
+public class ReqBookingDto {
     @NotNull(message = START_DATE_NULL_MESSAGE)
     @FutureOrPresent(message = BOOKING_START_DATE_VALID_MESSAGE)
     private LocalDateTime start;
