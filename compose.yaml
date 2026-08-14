@@ -10,7 +10,7 @@ services:
       POSTGRES_DB: shareit
       POSTGRES_USER: dbuser
       POSTGRES_PASSWORD: "12345"
-      TZ: Europe/Moscow
+#      TZ: Europe/Moscow
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
       timeout: 5s
@@ -25,14 +25,14 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - db
-#        condition: service_healthy
+      db:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/shareit
       SPRING_DATASOURCE_USERNAME: dbuser
       SPRING_DATASOURCE_PASSWORD: "12345"
       SERVER_PORT: 9090
-      TZ: Europe/Moscow
+#      TZ: Europe/Moscow
 
   gateway:
     build:
@@ -45,4 +45,4 @@ services:
       - server
     environment:
       SHAREIT_SERVER_URL: http://server:9090
-      TZ: Europe/Moscow
+#      TZ: Europe/Moscow
