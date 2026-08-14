@@ -84,6 +84,14 @@
 								<exclude>**/ru/practicum/shareit/constant/message/*</exclude>
 							</excludes>
 						</configuration>
+						<executions>
+							<execution>
+								<id>jacoco-check</id>
+								<goals>
+									<goal>check</goal>
+								</goals>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
