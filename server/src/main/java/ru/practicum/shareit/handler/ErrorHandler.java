@@ -1,7 +1,5 @@
 package ru.practicum.shareit.handler;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -16,7 +14,6 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -36,15 +33,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationError(final ValidationException e) {
         return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleConstraintViolation(final ConstraintViolationException e) {
-        String cleanMessage = e.getConstraintViolations().stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.joining(", "));
-        return new ErrorResponse(cleanMessage);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
