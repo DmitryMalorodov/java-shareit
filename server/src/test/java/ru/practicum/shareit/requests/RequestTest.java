@@ -102,10 +102,10 @@ public class RequestTest extends ShareItTests {
                 "Текст запроса '%s' не соответствует ожидаемому '%s'", softAssert);
         isCloseTo(actRequest.getCreated(), LocalDateTime.now(),
                 "Дата/Время создания запроса '%s' не соответствует ожидаемому '%s'", softAssert);
-        isEqualTo(actRequest.getResponses().size(), expResponses.size(),
+        isEqualTo(actRequest.getItems().size(), expResponses.size(),
                 "Количество ответов на запрос '%d' не соответствует ожидаемому '%d'", softAssert);
 
-        Map<Long, ResponseDto> actResponses = actRequest.getResponses().stream()
+        Map<Long, ResponseDto> actResponses = actRequest.getItems().stream()
                 .collect(Collectors.toMap(ResponseDto::getId, Function.identity()));
         expResponses.forEach(expResponse -> {
             ResponseDto actResponse = actResponses.get(expResponse.getId());

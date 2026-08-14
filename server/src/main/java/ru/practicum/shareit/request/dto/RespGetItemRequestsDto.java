@@ -12,5 +12,5 @@ public class RespGetItemRequestsDto {
     private Long id;
     private String description;
     private LocalDateTime created;
-    private Collection<ResponseDto> responses;
+    private Collection<ResponseDto> items;
 }
