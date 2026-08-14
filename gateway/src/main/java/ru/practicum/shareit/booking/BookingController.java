@@ -13,6 +13,8 @@ import ru.practicum.shareit.booking.dto.ReqBookingDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.exceptions.ValidationException;
 
+import static ru.practicum.shareit.constant.message.BookingValidMessages.INCORRECT_STATE_PARAMETER;
+
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
@@ -67,7 +69,7 @@ public class BookingController {
             @RequestParam(name = "state", defaultValue = "all") final String stateParam
     ) {
         BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new ValidationException("Unknown state: " + stateParam));
+                .orElseThrow(() -> new ValidationException(String.format(INCORRECT_STATE_PARAMETER, stateParam)));
         log.info("Get user bookings with state {}, userId={}", stateParam, userId);
         return bookingClient.getUserBookings(userId, state);
     }
@@ -81,7 +83,7 @@ public class BookingController {
             @RequestParam(name = "state", defaultValue = "all") final String stateParam
     ) {
         BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new ValidationException("Unknown state: " + stateParam));
+                .orElseThrow(() -> new ValidationException(String.format(INCORRECT_STATE_PARAMETER, stateParam)));
         log.info("Get user items bookings with state {}, userId={}", stateParam, userId);
         return bookingClient.getUserItemsBookings(userId, state);
     }

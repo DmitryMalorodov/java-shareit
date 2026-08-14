@@ -34,7 +34,7 @@ public class BookingTests extends BookingTest {
 
     @Test
     void checkEndNullValidation() throws Exception {
-        ReqBookingDto endNull = prepareReqBody(TODAY, null);
+        ReqBookingDto endNull = prepareReqBody(TOMORROW, null);
         checkValidationError(createBookingResAct(endNull, USER_ID), END_DATE_NULL_MESSAGE);
         verifyNoInteractions(bookingClient);
     }
@@ -54,7 +54,7 @@ public class BookingTests extends BookingTest {
 
     @Test
     void checkGetUserItemsBookingsByBookingsOwner() throws Exception {
-        checkValidationError(getUserItemsBookingsResAct(USER_ID, "1"), "Unknown state: 1");
+        checkValidationError(getUserItemsBookingsResAct(USER_ID, "1"), String.format(INCORRECT_STATE_PARAMETER, "1"));
         verifyNoInteractions(bookingClient);
     }
 

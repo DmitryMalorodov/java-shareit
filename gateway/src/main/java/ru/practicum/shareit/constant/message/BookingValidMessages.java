@@ -12,4 +12,5 @@ public class BookingValidMessages {
     public static final String BOOKING_START_DATE_VALID_MESSAGE = "Дата начала бронирования не может быть в прошлом";
     public static final String BOOKING_END_DATE_VALID_MESSAGE = "Дата окончания бронирования может быть только в будущем";
     public static final String USER_DO_NOT_HAVE_ANY_ITEM = "У пользователя нет ни одной вещи!";
+    public static final String INCORRECT_STATE_PARAMETER = "Некорректный параметр state - '%s'";
 }
