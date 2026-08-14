@@ -1,10 +1,10 @@
 package ru.practicum.shareit.constant.message;
 
-public class BookingValidMessages {
-    public static final String BOOKING_NOT_FOUND_MESSAGE = "Бронирование не найдено с id: %d";
-    public static final String BOOKING_ACCESS_ERROR = "Бронироваие может просматривать либо автор бронирования," +
+public interface BookingValidMessages {
+    String BOOKING_NOT_FOUND_MESSAGE = "Бронирование не найдено с id: %d";
+    String BOOKING_ACCESS_ERROR = "Бронироваие может просматривать либо автор бронирования," +
             " либо владелец вещи данного бронирования";
-    public static final String BOOKING_APPROVED_ACCESS_ERROR = "Статус бронирования может менять только владелец " +
+    String BOOKING_APPROVED_ACCESS_ERROR = "Статус бронирования может менять только владелец " +
             "вещи данного бронирования";
-    public static final String USER_DO_NOT_HAVE_ANY_ITEM = "У пользователя нет ни одной вещи!";
+    String USER_DO_NOT_HAVE_ANY_ITEM = "У пользователя нет ни одной вещи!";
 }
