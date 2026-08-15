@@ -33,6 +33,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: "12345"
       SERVER_PORT: 9090
       TZ: Europe/Moscow
+      JAVA_OPTS: "-Duser.timezone=Europe/Moscow -Dserver.port=9090"
 
   gateway:
     build:
@@ -46,3 +47,4 @@ services:
     environment:
       SHAREIT_SERVER_URL: http://server:9090
       TZ: Europe/Moscow
+      JAVA_OPTS: "-Duser.timezone=Europe/Moscow"
