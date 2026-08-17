@@ -13,4 +13,8 @@ public class ItemData {
     public static final ReqCommentDto comment = ReqCommentDto.builder()
             .text(" ")
             .build();
+
+    public static final ReqCommentDto comment2 = ReqCommentDto.builder()
+            .text("text")
+            .build();
 }

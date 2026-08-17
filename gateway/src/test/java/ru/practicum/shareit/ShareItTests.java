@@ -1,6 +1,8 @@
 package ru.practicum.shareit;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +22,8 @@ public class ShareItTests {
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    protected static final String HEADER_NAME = "X-Sharer-User-Id";
 
     protected void checkValidationError(ResultActions response, String expMessage) throws Exception {
         response
@@ -52,5 +56,14 @@ public class ShareItTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Sharer-User-Id", userId)
                 .content(objectMapper.writeValueAsString(request)));
+    }
+
+    protected static <T> String toJson(T object) {
+        ObjectMapper om = new ObjectMapper().registerModule(new JavaTimeModule());
+        try {
+            return om.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -11,10 +11,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @WebMvcTest(BookingController.class)
 public class BookingTest extends ShareItTests {
+    static final String BOOKINGS = "/bookings";
     static final String BOOKINGS_OWNER = "/bookings/owner";
 
     @MockBean
     protected BookingClient bookingClient;
+
+    ResultActions getUserBookingsResAct(Long userId, String state) throws Exception {
+        return mockMvc.perform(get(BOOKINGS)
+                .queryParam("state", state)
+                .header("X-Sharer-User-Id", userId));
+    }
 
     ResultActions getUserItemsBookingsResAct(Long userId, String state) throws Exception {
         return mockMvc.perform(get(BOOKINGS_OWNER)

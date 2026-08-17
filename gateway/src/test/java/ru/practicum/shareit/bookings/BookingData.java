@@ -9,4 +9,10 @@ public class BookingData {
             .start(LocalDateTime.now().plusDays(1))
             .end(LocalDateTime.now().plusDays(5))
             .build();
+
+    public static final ReqBookingDto booking2 = ReqBookingDto.builder()
+            .start(LocalDateTime.now().plusDays(1))
+            .end(LocalDateTime.now().plusDays(5))
+            .itemId(1L)
+            .build();
 }
