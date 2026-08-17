@@ -21,8 +21,10 @@ public class BookingJsonTests {
     @Autowired
     private JacksonTester<RespBookingDto> json;
 
-    private static final LocalDateTime START = LocalDateTime.now().withNano(0);
-    private static final LocalDateTime END = LocalDateTime.now().plusDays(1).withNano(0);
+    private static final LocalDateTime START = LocalDateTime.of(
+            2026, 8, 17, 20, 41, 15);
+    private static final LocalDateTime END = LocalDateTime.of(
+            2026, 8, 18, 20, 41, 15);
 
     @Test
     void checkJson() throws IOException {

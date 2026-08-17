@@ -25,7 +25,8 @@ public class RequestJsonTests {
     @Autowired
     private JacksonTester<RespGetItemRequestsDto> json2;
 
-    private static final LocalDateTime DATE_TIME = LocalDateTime.now().withNano(0);
+    private static final LocalDateTime DATE_TIME = LocalDateTime.of(
+            2026, 8, 17, 20, 41, 15);
 
     @Test
     void checkJson() throws IOException {
