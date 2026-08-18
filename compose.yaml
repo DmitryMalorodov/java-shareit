@@ -10,19 +10,20 @@ services:
       POSTGRES_DB: shareit
       POSTGRES_USER: dbuser
       POSTGRES_PASSWORD: "12345"
+      TZ: Europe/Moscow
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
       timeout: 5s
       interval: 5s
       retries: 10
 
-  app:
+  server:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: shareit_app
+      dockerfile: server/Dockerfile
+    container_name: shareit_server
     ports:
-      - "8080:8080"
+      - "9090:9090"
     depends_on:
       db:
         condition: service_healthy
@@ -30,3 +31,20 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/shareit
       SPRING_DATASOURCE_USERNAME: dbuser
       SPRING_DATASOURCE_PASSWORD: "12345"
+      SERVER_PORT: 9090
+      TZ: Europe/Moscow
+      JAVA_OPTS: "-Duser.timezone=Europe/Moscow -Dserver.port=9090"
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    container_name: shareit_gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+    environment:
+      SHAREIT_SERVER_URL: http://server:9090
+      TZ: Europe/Moscow
+      JAVA_OPTS: "-Duser.timezone=Europe/Moscow"
